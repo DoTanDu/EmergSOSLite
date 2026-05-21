@@ -132,6 +132,7 @@ Sử dụng Firebase Authentication SDK với phương thức Email/Password.
 **Đăng nhập (`loginUser`):**
 - Gọi `signInWithEmailAndPassword(auth, email, password)`.
 - Firebase tự quản lý session, `auth.currentUser` sẽ có giá trị sau khi đăng nhập.
+- **UX Improvement**: Tự động kiểm tra và thêm đuôi `@gmail.com` nếu người dùng chỉ nhập tên tài khoản, giúp thao tác đăng nhập/đăng ký nhanh chóng hơn.
 
 **Kiểm tra trạng thái đăng nhập:**
 - `AppNavigator.js` dùng `onAuthStateChanged(auth, callback)` để lắng nghe thay đổi trạng thái auth và tự động chuyển hướng Home ↔ Login.
@@ -213,6 +214,9 @@ Vui lòng liên hệ hoặc đến hỗ trợ tôi sớm nhất có thể.
 
 Mỗi query đều lọc theo `userId` để đảm bảo người dùng chỉ thấy dữ liệu của chính mình.
 
+**Tính năng Gọi trực tiếp (Direct Call):**
+Được tích hợp ngay trên thẻ liên hệ (ContactCard), sử dụng API `Linking.openURL('tel:...')` của React Native để kích hoạt ngay ứng dụng gọi điện của hệ điều hành mà không cần thoát app, giúp tiết kiệm thời gian quý báu khi khẩn cấp.
+
 ### 4.5. Báo cáo điểm nguy hiểm
 
 **File:** `src/services/dangerReportService.js`
@@ -220,6 +224,14 @@ Mỗi query đều lọc theo `userId` để đảm bảo người dùng chỉ t
 - `addDangerReport()`: Lấy GPS hiện tại + loại nguy hiểm + mô tả → lưu vào Firestore.
 - `getDangerReports()`: Lấy toàn bộ báo cáo của cộng đồng, sắp xếp mới nhất lên đầu.
 - Bản Lite hiển thị dạng **list** thay vì bản đồ tương tác để đảm bảo ổn định khi demo.
+
+### 4.6. Cuộc gọi giả (Fake Call)
+
+**File:** `src/screens/FakeCallScreen.js` & `src/screens/IncomingFakeCallScreen.js`
+
+- Sử dụng `setTimeout` để hẹn giờ mô phỏng cuộc gọi đến (ví dụ: 5s, 10s, 30s).
+- Khi hết giờ, ứng dụng điều hướng sang màn hình Fake Call giả lập giao diện đổ chuông của điện thoại.
+- **Tính thực tế cao:** Khi người dùng bấm "Nghe máy", màn hình không thoát ngay mà chuyển sang trạng thái "Đang gọi" cùng với bộ đếm thời gian (`setInterval` đếm giây) giống hệt một cuộc gọi thật, giúp người dùng có cớ để thoát khỏi tình huống khó xử một cách tự nhiên.
 
 ---
 
