@@ -3,7 +3,8 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
-import { markSosAsSafe, shareSosMessage } from '../services/sosService';
+import { markSosAsSafe, sendSosSms } from '../services/sosService';
+import { getContactsByUser } from '../services/contactService';
 
 export default function SosAlertScreen({ navigation, route }) {
   const event = route.params?.event;
@@ -20,9 +21,14 @@ export default function SosAlertScreen({ navigation, route }) {
 
   async function handleShare() {
     try {
-      await shareSosMessage(event.message);
+      setLoading(true);
+      const contacts = await getContactsByUser(event.userId);
+      const phones = contacts.map(c => c.phone).filter(Boolean);
+      await sendSosSms(phones, event.message);
     } catch (error) {
       Alert.alert('Không thể chia sẻ', error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
