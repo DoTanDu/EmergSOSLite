@@ -4,7 +4,14 @@ import { useFocusEffect } from '@react-navigation/native';
 import HistoryCard from '../components/HistoryCard';
 import { colors } from '../constants/colors';
 import { auth } from '../config/firebase';
-import { getSosEventsByUser, markSosAsSafe, shareSosMessage } from '../services/sosService';
+import {
+  createSafeMessage,
+  getSosEventsByUser,
+  markSosAsSafe,
+  sendSosSms,
+  shareSosMessage
+} from '../services/sosService';
+import { getContactsByUser } from '../services/contactService';
 
 export default function SosHistoryScreen() {
   const [events, setEvents] = useState([]);
@@ -30,9 +37,25 @@ export default function SosHistoryScreen() {
     }, [loadEvents])
   );
 
-  async function handleMarkSafe(eventId) {
+  async function notifySafeContacts(event) {
+    const contacts = await getContactsByUser(event.userId);
+    const phones = contacts.map((contact) => contact.phone).filter(Boolean);
+    const safeMessage = createSafeMessage(event);
+
+    await sendSosSms(phones, safeMessage);
+
+    Alert.alert(
+      'Đã thông báo an toàn',
+      phones.length > 0
+        ? 'App đã mở tin nhắn thông báo an toàn cho danh bạ. Bạn chỉ cần bấm gửi trong ứng dụng tin nhắn.'
+        : 'Không có số điện thoại trong danh bạ, app đã mở share sheet để chia sẻ thông báo an toàn.'
+    );
+  }
+
+  async function handleMarkSafe(event) {
     try {
-      await markSosAsSafe(eventId);
+      await markSosAsSafe(event.id);
+      await notifySafeContacts(event);
       await loadEvents();
     } catch (error) {
       Alert.alert('Cập nhật thất bại', error.message);
@@ -55,7 +78,7 @@ export default function SosHistoryScreen() {
           <HistoryCard
             key={event.id}
             event={event}
-            onMarkSafe={() => handleMarkSafe(event.id)}
+            onMarkSafe={() => handleMarkSafe(event)}
             onShare={() => shareSosMessage(event.message)}
           />
         ))

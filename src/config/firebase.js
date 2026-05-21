@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import {
   getAuth,
@@ -21,9 +22,13 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 let authInstance;
 
 try {
-  authInstance = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage)
-  });
+  if (Platform.OS === 'web') {
+    authInstance = getAuth(app);
+  } else {
+    authInstance = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage)
+    });
+  }
 } catch (error) {
   authInstance = getAuth(app);
 }

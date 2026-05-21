@@ -23,6 +23,14 @@ export function createSosMessage({ latitude, longitude, createdAt = new Date() }
   return `Tôi đang cần trợ giúp khẩn cấp!\n\nVị trí hiện tại của tôi:\n${mapUrl}\n\nThời gian: ${formatDate(createdAt)}\nVui lòng liên hệ hoặc đến hỗ trợ tôi sớm nhất có thể.`;
 }
 
+export function createSafeMessage(event = {}) {
+  const latitude = event.latitude;
+  const longitude = event.longitude;
+  const mapUrl = event.mapUrl || (latitude && longitude ? createMapUrl(latitude, longitude) : 'Không có vị trí');
+
+  return `Tôi đã an toàn!\n\nCảnh báo SOS trước đó đã được kết thúc.\nVị trí đã gửi trước đó:\n${mapUrl}\n\nThời gian cập nhật: ${formatDate(new Date())}\nCảm ơn bạn đã quan tâm và hỗ trợ.`;
+}
+
 export async function createSosEvent(userId, location) {
   const createdAt = new Date();
   const mapUrl = createMapUrl(location.latitude, location.longitude);
@@ -55,7 +63,10 @@ export async function shareSosMessage(message) {
 }
 
 export async function sendSosSms(phones, message) {
-  const cleanedPhones = Array.isArray(phones) ? phones.filter(Boolean) : [];
+  const cleanedPhones = Array.isArray(phones)
+    ? phones.map((phone) => String(phone).trim()).filter(Boolean)
+    : [];
+
   const isAvailable = await SMS.isAvailableAsync();
 
   if (isAvailable && cleanedPhones.length > 0) {
@@ -63,6 +74,15 @@ export async function sendSosSms(phones, message) {
   }
 
   return Share.share({ message });
+}
+
+export async function sendSafeMessageToContacts(contacts, event) {
+  const phones = Array.isArray(contacts)
+    ? contacts.map((contact) => contact.phone).filter(Boolean)
+    : [];
+
+  const safeMessage = createSafeMessage(event);
+  return sendSosSms(phones, safeMessage);
 }
 
 export async function getSosEventsByUser(userId) {
