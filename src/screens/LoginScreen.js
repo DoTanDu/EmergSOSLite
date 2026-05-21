@@ -18,9 +18,14 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+    let finalEmail = email.trim();
+    if (!finalEmail.includes('@')) {
+      finalEmail += '@gmail.com';
+    }
+
     try {
       setLoading(true);
-      await loginUser({ email, password });
+      await loginUser({ email: finalEmail, password });
     } catch (error) {
       Alert.alert('Đăng nhập lỗi', error.message);
     } finally {

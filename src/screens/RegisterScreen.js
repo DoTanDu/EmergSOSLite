@@ -16,14 +16,19 @@ export default function RegisterScreen({ navigation }) {
   }
 
   async function handleRegister() {
+    let finalEmail = form.email.trim();
+    if (!finalEmail.includes('@') && finalEmail.length > 0) {
+      finalEmail += '@gmail.com';
+    }
+
     if (!form.fullName.trim()) return Alert.alert('Lỗi', 'Nhập họ tên.');
-    if (!isValidEmail(form.email)) return Alert.alert('Lỗi', 'Email không hợp lệ.');
+    if (!isValidEmail(finalEmail)) return Alert.alert('Lỗi', 'Email không hợp lệ.');
     if (!isValidPhone(form.phone)) return Alert.alert('Lỗi', 'Số điện thoại không hợp lệ.');
     if (form.password.length < 6) return Alert.alert('Lỗi', 'Mật khẩu tối thiểu 6 ký tự.');
 
     try {
       setLoading(true);
-      await registerUser(form);
+      await registerUser({ ...form, email: finalEmail });
     } catch (error) {
       Alert.alert('Đăng ký lỗi', error.message);
     } finally {
