@@ -8,14 +8,14 @@
 
 | Công nghệ | Phiên bản | Mục đích |
 |---|---|---|
-| React Native | Theo Expo SDK 55 | Nền tảng phát triển ứng dụng di động đa nền tảng |
-| Expo | SDK 55 | Bộ công cụ hỗ trợ build, chạy thử, quản lý native module |
-| Expo Go | Mới nhất | Chạy thử app trực tiếp trên điện thoại thật qua QR code |
-| Firebase Authentication | v11 (Web SDK) | Xác thực người dùng bằng Email/Password |
-| Cloud Firestore | v11 (Web SDK) | Cơ sở dữ liệu NoSQL thời gian thực lưu contact, SOS, báo cáo |
-| Expo Location | Mới nhất | Lấy tọa độ GPS (latitude/longitude) từ thiết bị |
-| React Navigation | v7 | Quản lý điều hướng giữa các màn hình |
-| expo-sharing | Mới nhất | Chia sẻ nội dung qua ứng dụng khác (Zalo, Messenger, SMS...) |
+| React Native | 0.76.5 | Nền tảng phát triển ứng dụng di động đa nền tảng |
+| Expo | SDK 54 | Bộ công cụ hỗ trợ build, chạy thử, quản lý native module |
+| Expo Go | SDK 54.0.0 | Chạy thử app trực tiếp trên điện thoại thật qua QR code |
+| Firebase Authentication | v10 (Web SDK) | Xác thực người dùng bằng Email/Password |
+| Cloud Firestore | v10 (Web SDK) | Cơ sở dữ liệu NoSQL thời gian thực lưu contact, SOS, báo cáo |
+| Expo Location | ~18.0.4 | Lấy tọa độ GPS (latitude/longitude) từ thiết bị |
+| React Navigation | v6 | Quản lý điều hướng giữa các màn hình |
+| expo-sharing | ~13.0.1 | Chia sẻ nội dung qua ứng dụng khác (Zalo, Messenger, SMS...) |
 
 ### 1.1. Lý do chọn Firebase Spark (miễn phí)
 
