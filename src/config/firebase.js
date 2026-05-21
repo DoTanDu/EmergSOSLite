@@ -2,15 +2,13 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// TODO: Thành viên 2 thay config này bằng config lấy trong Firebase Console.
-// Lưu ý: Firebase web config không phải mật khẩu, nhưng vẫn không nên commit file .env chứa secret riêng.
 const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT.firebaseapp.com',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_PROJECT.appspot.com',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID'
+  apiKey: 'AIzaSyBai1HNn5mFdN-TpSFfysy4VZRcFbDZTz8',
+  authDomain: 'emergsoslite.firebaseapp.com',
+  projectId: 'emergsoslite',
+  storageBucket: 'emergsoslite.firebasestorage.app',
+  messagingSenderId: '1031016636784',
+  appId: '1:1031016636784:web:22d2fe644fafd155b8afb5'
 };
 
 const app = initializeApp(firebaseConfig);
