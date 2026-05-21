@@ -37,7 +37,13 @@ export default function SosAlertScreen({ navigation, route }) {
       setLoading(true);
       await markSosAsSafe(event.id);
       setStatus('safe');
-      Alert.alert('Đã cập nhật', 'Trạng thái SOS đã chuyển sang an toàn.');
+      
+      // Auto pre-fill SMS to notify contacts that user is safe
+      const contacts = await getContactsByUser(event.userId);
+      const phones = contacts.map(c => c.phone).filter(Boolean);
+      const safeMessage = 'Tôi đã an toàn. Tình huống khẩn cấp đã được giải quyết. Cảm ơn bạn đã quan tâm!';
+      
+      await sendSosSms(phones, safeMessage);
     } catch (error) {
       Alert.alert('Cập nhật thất bại', error.message);
     } finally {
