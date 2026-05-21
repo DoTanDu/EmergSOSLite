@@ -1,0 +1,30 @@
+{
+  "name": "emergsos-lite",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-navigation/native": "latest",
+    "@react-navigation/native-stack": "latest",
+    "expo": "^55.0.0",
+    "expo-linking": "latest",
+    "expo-location": "latest",
+    "expo-sharing": "latest",
+    "firebase": "latest",
+    "react": "latest",
+    "react-native": "latest",
+    "react-native-maps": "latest",
+    "react-native-safe-area-context": "latest",
+    "react-native-screens": "latest"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18"
+  }
+}

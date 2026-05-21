@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "EmergSOS Lite",
+    "slug": "emergsos-lite",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#E53935"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "EmergSOS Lite cần vị trí để tạo cảnh báo SOS kèm link Google Maps."
+      }
+    },
+    "android": {
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+      "adaptiveIcon": {
+        "backgroundColor": "#E53935"
+      }
+    }
+  }
+}
