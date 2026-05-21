@@ -3,12 +3,14 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
-import { markSosAsSafe, shareSosMessage } from '../services/sosService';
+import { markSosAsSafe, sendSosSms, shareSosMessage } from '../services/sosService';
+import { getContactsByUser } from '../services/contactService';
 
 export default function SosAlertScreen({ navigation, route }) {
   const event = route.params?.event;
   const [status, setStatus] = useState(event?.status || 'active');
   const [loading, setLoading] = useState(false);
+  const [smsLoading, setSmsLoading] = useState(false);
 
   if (!event) {
     return (
@@ -23,6 +25,19 @@ export default function SosAlertScreen({ navigation, route }) {
       await shareSosMessage(event.message);
     } catch (error) {
       Alert.alert('Không thể chia sẻ', error.message);
+    }
+  }
+
+  async function handleSms() {
+    try {
+      setSmsLoading(true);
+      const contacts = await getContactsByUser(event.userId);
+      const phones = contacts.map((contact) => contact.phone).filter(Boolean);
+      await sendSosSms(phones, event.message);
+    } catch (error) {
+      Alert.alert('Không thể gửi SMS', error.message);
+    } finally {
+      setSmsLoading(false);
     }
   }
 
@@ -52,6 +67,7 @@ export default function SosAlertScreen({ navigation, route }) {
       </View>
 
       <PrimaryButton title="Chia sẻ cảnh báo" onPress={handleShare} />
+      <PrimaryButton title="Gửi SMS cho danh bạ" variant="outline" onPress={handleSms} loading={smsLoading} />
       {status === 'active' ? <PrimaryButton title="Tôi đã an toàn" variant="success" onPress={handleSafe} loading={loading} /> : null}
       <PrimaryButton title="Xem lịch sử SOS" variant="outline" onPress={() => navigation.navigate('SosHistory')} />
     </ScreenContainer>

@@ -15,7 +15,7 @@
 | Cloud Firestore | v10 (Web SDK) | Cơ sở dữ liệu NoSQL thời gian thực lưu contact, SOS, báo cáo |
 | Expo Location | ~18.0.4 | Lấy tọa độ GPS (latitude/longitude) từ thiết bị |
 | React Navigation | v6 | Quản lý điều hướng giữa các màn hình |
-| expo-sharing | ~13.0.1 | Chia sẻ nội dung qua ứng dụng khác (Zalo, Messenger, SMS...) |
+| expo-sms | ~12.0.1 | Mở ứng dụng SMS và tự động điền số điện thoại + nội dung |
 
 ### 1.1. Lý do chọn Firebase Spark (miễn phí)
 
@@ -180,10 +180,13 @@ createSosEvent() → lưu document vào Firestore sosEvents (status: "active")
 Điều hướng sang SosAlertScreen (hiển thị message)
         │
         ▼
-shareSosMessage() → mở Share Sheet (Zalo/Messenger/SMS/Gmail)
+Lấy danh bạ khẩn cấp → sendSosSms(phones, message)
         │
         ▼
-[Tùy chọn] markSosAsSafe() → cập nhật status: "safe", endedAt: now
+Mở ứng dụng SMS trên máy, tự động điền tất cả các số liên hệ khẩn cấp
+        │
+        ▼
+[Tùy chọn] markSosAsSafe() → cập nhật "safe" và tạo SMS thông báo an toàn
 ```
 
 **Mẫu nội dung tin nhắn SOS:**
@@ -274,8 +277,8 @@ Các truy vấn dùng `where('userId', '==', ...)` kết hợp `orderBy('created
 | T04 | Thêm liên hệ | Thêm Mẹ / 09xxxxxxxx / Mẹ | Contact xuất hiện trong danh sách |
 | T05 | Xóa liên hệ | Xóa một contact | Contact biến mất khỏi Firestore và list |
 | T06 | Lấy vị trí | Bấm lấy vị trí | Có latitude/longitude hoặc báo lỗi quyền |
-| T07 | SOS | Nhấn giữ SOS 3 giây | Tạo message + event `active` trong Firestore |
-| T08 | Chia sẻ | Bấm "Chia sẻ cảnh báo" | Share sheet mở ra với nội dung đúng |
+| T07 | SOS | Nhấn giữ SOS 3 giây | Tạo message, mở trình SMS điền sẵn số ĐT |
+| T08 | Báo An toàn | Bấm "Tôi đã an toàn" | Đổi trạng thái, mở trình SMS báo an toàn |
 | T09 | Lịch sử SOS | Vào màn hình lịch sử | Hiển thị event mới nhất, đúng user |
 | T10 | Tôi đã an toàn | Bấm nút | Event chuyển `safe`, `endedAt` có giá trị |
 | T11 | Fake Call | Chọn 5 giây và Start | Sau 5 giây hiện màn hình cuộc gọi giả |
@@ -291,7 +294,7 @@ Các truy vấn dùng `where('userId', '==', ...)` kết hợp `orderBy('created
 | Hạn chế | Lý do |
 |---|---|
 | Không theo dõi vị trí nền 24/7 | Khó xin quyền, hao pin, dễ lỗi trên thiết bị thật |
-| Không tự động gửi SMS | Cần SMS API có phí (Twilio, VIVAS...) |
+| Không gửi SMS tự động ngầm 100% | OS iOS/Android cấm gửi ngầm không qua xác nhận. Giải pháp hiện tại là điền sẵn SMS để người dùng tự bấm Gửi. |
 | Không push notification | Cần Firebase Cloud Messaging + server xử lý |
 | Danger Map dạng list, không phải bản đồ | `react-native-maps` phụ thuộc vào Google Maps API Key có thể phát sinh chi phí |
 

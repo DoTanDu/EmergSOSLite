@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
 
 export default function IncomingFakeCallScreen({ navigation, route }) {
   const callerName = route.params?.callerName || 'Người thân';
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    if (!isAnswered) return undefined;
+
+    const interval = setInterval(() => {
+      setSeconds((current) => current + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isAnswered]);
+
+  const formatTime = (totalSeconds) => {
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const remainSeconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${remainSeconds}`;
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.calling}>Cuộc gọi đến...</Text>
+      <Text style={styles.calling}>{isAnswered ? formatTime(seconds) : 'Cuộc gọi đến...'}</Text>
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{callerName.charAt(0).toUpperCase()}</Text>
       </View>
@@ -16,8 +34,14 @@ export default function IncomingFakeCallScreen({ navigation, route }) {
       <Text style={styles.phone}>Di động</Text>
 
       <View style={styles.actions}>
-        <PrimaryButton title="Từ chối" variant="danger" onPress={() => navigation.goBack()} style={styles.button} />
-        <PrimaryButton title="Nghe máy" variant="success" onPress={() => navigation.goBack()} style={styles.button} />
+        {isAnswered ? (
+          <PrimaryButton title="Kết thúc" variant="danger" onPress={() => navigation.goBack()} style={styles.button} />
+        ) : (
+          <>
+            <PrimaryButton title="Từ chối" variant="danger" onPress={() => navigation.goBack()} style={styles.button} />
+            <PrimaryButton title="Nghe máy" variant="success" onPress={() => setIsAnswered(true)} style={styles.button} />
+          </>
+        )}
       </View>
     </View>
   );

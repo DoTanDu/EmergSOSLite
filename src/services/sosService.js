@@ -1,4 +1,5 @@
 import { Share } from 'react-native';
+import * as SMS from 'expo-sms';
 import { db } from '../config/firebase';
 import {
   addDoc,
@@ -50,6 +51,17 @@ export async function createSosEvent(userId, location) {
 }
 
 export async function shareSosMessage(message) {
+  return Share.share({ message });
+}
+
+export async function sendSosSms(phones, message) {
+  const cleanedPhones = Array.isArray(phones) ? phones.filter(Boolean) : [];
+  const isAvailable = await SMS.isAvailableAsync();
+
+  if (isAvailable && cleanedPhones.length > 0) {
+    return SMS.sendSMSAsync(cleanedPhones, message);
+  }
+
   return Share.share({ message });
 }
 

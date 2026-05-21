@@ -2,33 +2,37 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
 
-    // users: chỉ chính user đó mới đọc/ghi được
+    function ownsResource() {
+      return signedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    function ownsRequest() {
+      return signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if signedIn() && request.auth.uid == userId;
+      allow read, update, delete: if signedIn() && request.auth.uid == userId;
     }
 
-    // emergencyContacts: chỉ chủ sở hữu mới đọc/ghi được
-    match /emergencyContacts/{docId} {
-      allow read, write: if request.auth != null
-        && (resource == null || resource.data.userId == request.auth.uid)
-        && (request.resource == null || request.resource.data.userId == request.auth.uid);
+    match /emergencyContacts/{contactId} {
+      allow create: if ownsRequest();
+      allow read, update, delete: if ownsResource();
     }
 
-    // sosEvents: chỉ chủ sở hữu mới đọc/ghi được
-    match /sosEvents/{docId} {
-      allow read, write: if request.auth != null
-        && (resource == null || resource.data.userId == request.auth.uid)
-        && (request.resource == null || request.resource.data.userId == request.auth.uid);
+    match /sosEvents/{eventId} {
+      allow create: if ownsRequest();
+      allow read, update, delete: if ownsResource();
     }
 
-    // dangerReports: mọi user đã đăng nhập đều đọc được; chỉ chủ mới ghi được
-    match /dangerReports/{docId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null
-        && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null
-        && resource.data.userId == request.auth.uid;
+    match /dangerReports/{reportId} {
+      allow read: if signedIn();
+      allow create: if ownsRequest();
+      allow update, delete: if ownsResource();
     }
   }
 }
