@@ -8,8 +8,8 @@ export default function RecordCircleButton({ isRecording, onPress }) {
       <Pressable onPress={onPress} style={({ pressed }) => [styles.outer, pressed && styles.pressed]}>
         <View style={[styles.inner, isRecording ? styles.innerActive : styles.innerIdle]} />
       </Pressable>
-      <Text style={styles.label}>Ghi am</Text>
-      <Text style={styles.hint}>{isRecording ? 'Dang ghi am' : 'Nhan de bat/tat'}</Text>
+      <Text style={styles.label}>Ghi âm</Text>
+      <Text style={styles.hint}>{isRecording ? 'Đang ghi âm' : 'Nhấn để bật/tắt'}</Text>
     </View>
   );
 }

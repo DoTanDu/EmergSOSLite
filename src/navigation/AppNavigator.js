@@ -26,7 +26,7 @@ function LoadingScreen() {
   return (
     <View style={styles.loading}>
       <ActivityIndicator color={colors.primary} size="large" />
-      <Text style={styles.loadingText}>Dang mo EmergSOS Lite...</Text>
+      <Text style={styles.loadingText}>Đang mở EmergSOS Lite...</Text>
     </View>
   );
 }
@@ -49,26 +49,26 @@ function AppStack() {
         headerTitleStyle: { fontWeight: '900' },
         headerRight: () => (
           <Pressable onPress={() => navigation.navigate('Profile')}>
-            <Text style={styles.profileLink}>Ho so</Text>
+            <Text style={styles.profileLink}>Hồ sơ</Text>
           </Pressable>
         )
       })}
     >
       <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'EmergSOS Lite' }} />
-      <Stack.Screen name="Contacts" component={ContactsScreen} options={{ title: 'Danh ba khan cap' }} />
-      <Stack.Screen name="AddContact" component={AddContactScreen} options={{ title: 'Lien he' }} />
+      <Stack.Screen name="Contacts" component={ContactsScreen} options={{ title: 'Danh bạ khẩn cấp' }} />
+      <Stack.Screen name="AddContact" component={AddContactScreen} options={{ title: 'Liên hệ' }} />
       <Stack.Screen name="SosAlert" component={SosAlertScreen} options={{ title: 'SOS Alert' }} />
-      <Stack.Screen name="SosHistory" component={SosHistoryScreen} options={{ title: 'Lich su SOS' }} />
-      <Stack.Screen name="RecordingHistory" component={RecordingHistoryScreen} options={{ title: 'Lich su ghi am' }} />
+      <Stack.Screen name="SosHistory" component={SosHistoryScreen} options={{ title: 'Lịch sử SOS' }} />
+      <Stack.Screen name="RecordingHistory" component={RecordingHistoryScreen} options={{ title: 'Lịch sử ghi âm' }} />
       <Stack.Screen name="FakeCall" component={FakeCallScreen} options={{ title: 'Fake Call' }} />
       <Stack.Screen
         name="IncomingFakeCall"
         component={IncomingFakeCallScreen}
         options={{ headerShown: false, presentation: 'fullScreenModal' }}
       />
-      <Stack.Screen name="DangerMap" component={DangerMapScreen} options={{ title: 'Diem nguy hiem' }} />
-      <Stack.Screen name="AddDangerReport" component={AddDangerReportScreen} options={{ title: 'Bao cao nguy hiem' }} />
-      <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Ho so', headerRight: () => null }} />
+      <Stack.Screen name="DangerMap" component={DangerMapScreen} options={{ title: 'Điểm nguy hiểm' }} />
+      <Stack.Screen name="AddDangerReport" component={AddDangerReportScreen} options={{ title: 'Báo cáo nguy hiểm' }} />
+      <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Hồ sơ', headerRight: () => null }} />
     </Stack.Navigator>
   );
 }
@@ -108,4 +108,3 @@ const styles = StyleSheet.create({
     fontWeight: '800'
   }
 });
-

@@ -29,13 +29,13 @@ export default function HomeScreen({ navigation }) {
     try {
       await toggleAmbientRecording();
     } catch (error) {
-      Alert.alert('Khong the ghi am', error.message);
+      Alert.alert('Không thể ghi âm', error.message);
     }
   }
 
   async function handleSosTrigger() {
     const user = auth.currentUser;
-    if (!user) return Alert.alert('Loi', 'Ban can dang nhap truoc khi SOS.');
+    if (!user) return Alert.alert('Lỗi', 'Bạn cần đăng nhập trước khi SOS.');
 
     try {
       setLoading(true);
@@ -44,7 +44,7 @@ export default function HomeScreen({ navigation }) {
         try {
           await startAmbientRecording();
         } catch (recordError) {
-          Alert.alert('Canh bao', `Khong bat duoc ghi am moi truong: ${recordError.message}`);
+          Alert.alert('Cảnh báo', `Không bật được ghi âm môi trường: ${recordError.message}`);
         }
       }
 
@@ -60,8 +60,8 @@ export default function HomeScreen({ navigation }) {
       try {
         event = await createSosEvent(user.uid, location);
       } catch (firebaseError) {
-        console.warn('Loi Firebase:', firebaseError.message);
-        Alert.alert('Offline', 'Khong luu duoc len he thong. Van mo SMS de gui vi tri.');
+        console.warn('Lỗi Firebase:', firebaseError.message);
+        Alert.alert('Offline', 'Không lưu được lên hệ thống. Vẫn mở SMS để gửi vị trí.');
       }
 
       try {
@@ -71,7 +71,7 @@ export default function HomeScreen({ navigation }) {
           await sendSosSms(phones, event.message);
         }
       } catch (smsError) {
-        console.warn('Gui SMS tu dong loi:', smsError.message);
+        console.warn('Gửi SMS tự động lỗi:', smsError.message);
       }
 
       const serializableEvent = {
@@ -80,7 +80,7 @@ export default function HomeScreen({ navigation }) {
       };
       navigation.navigate('SosAlert', { event: serializableEvent });
     } catch (error) {
-      Alert.alert('Khong the kich hoat SOS', error.message);
+      Alert.alert('Không thể kích hoạt SOS', error.message);
     } finally {
       setLoading(false);
     }
@@ -90,7 +90,7 @@ export default function HomeScreen({ navigation }) {
     <ScreenContainer style={styles.container}>
       <View style={styles.topCard}>
         <Text style={styles.hello}>EmergSOS Lite</Text>
-        <Text style={styles.title}>Nhan giu SOS 3 giay</Text>
+        <Text style={styles.title}>Nhấn giữ SOS 3 giây</Text>
       </View>
 
       <SosButton onTrigger={handleSosTrigger} disabled={loading} />
@@ -98,11 +98,11 @@ export default function HomeScreen({ navigation }) {
       <RecordCircleButton isRecording={recordingState.isRecording} onPress={handleToggleRecording} />
 
       <View style={styles.grid}>
-        <PrimaryButton title="Danh ba khan cap" onPress={() => navigation.navigate('Contacts')} style={styles.gridButton} />
-        <PrimaryButton title="Lich su SOS" variant="outline" onPress={() => navigation.navigate('SosHistory')} style={styles.gridButton} />
-        <PrimaryButton title="Lich su ghi am" variant="outline" onPress={() => navigation.navigate('RecordingHistory')} style={styles.gridButton} />
+        <PrimaryButton title="Danh bạ khẩn cấp" onPress={() => navigation.navigate('Contacts')} style={styles.gridButton} />
+        <PrimaryButton title="Lịch sử SOS" variant="outline" onPress={() => navigation.navigate('SosHistory')} style={styles.gridButton} />
+        <PrimaryButton title="Lịch sử ghi âm" variant="outline" onPress={() => navigation.navigate('RecordingHistory')} style={styles.gridButton} />
         <PrimaryButton title="Fake Call" variant="outline" onPress={() => navigation.navigate('FakeCall')} style={styles.gridButton} />
-        <PrimaryButton title="Diem nguy hiem" variant="outline" onPress={() => navigation.navigate('DangerMap')} style={styles.gridButton} />
+        <PrimaryButton title="Điểm nguy hiểm" variant="outline" onPress={() => navigation.navigate('DangerMap')} style={styles.gridButton} />
       </View>
     </ScreenContainer>
   );

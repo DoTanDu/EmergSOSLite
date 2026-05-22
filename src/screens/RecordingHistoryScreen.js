@@ -48,7 +48,7 @@ export default function RecordingHistoryScreen() {
       const history = await getRecordingHistory();
       setRecordings(history);
     } catch (error) {
-      Alert.alert('Loi tai du lieu', error.message);
+      Alert.alert('Lỗi tải dữ liệu', error.message);
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ export default function RecordingHistoryScreen() {
 
   async function handlePlayOrStop(item) {
     if (!item?.uri) {
-      Alert.alert('Khong co file', 'Ban ghi nay khong co duong dan file.');
+      Alert.alert('Không có file', 'Bản ghi này không có đường dẫn file.');
       return;
     }
 
@@ -89,7 +89,7 @@ export default function RecordingHistoryScreen() {
       player.play();
     } catch (error) {
       stopPlayback();
-      Alert.alert('Khong the phat ghi am', error.message);
+      Alert.alert('Không thể phát ghi âm', error.message);
     }
   }
 
@@ -101,7 +101,7 @@ export default function RecordingHistoryScreen() {
       const next = await removeRecordingHistoryItem(item.id);
       setRecordings(next);
     } catch (error) {
-      Alert.alert('Khong the xoa', error.message);
+      Alert.alert('Không thể xóa', error.message);
     }
   }
 
@@ -111,7 +111,7 @@ export default function RecordingHistoryScreen() {
       const next = await clearRecordingHistory();
       setRecordings(next);
     } catch (error) {
-      Alert.alert('Khong the xoa tat ca', error.message);
+      Alert.alert('Không thể xóa tất cả', error.message);
     }
   }
 
@@ -119,9 +119,9 @@ export default function RecordingHistoryScreen() {
     const isPlaying = playingId === item.id;
     return (
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Ban ghi am moi truong</Text>
-        <Text style={styles.meta}>Thoi gian: {formatDate(item.createdAt)}</Text>
-        <Text style={styles.meta}>Do dai: {formatDuration(item.durationMillis)}</Text>
+        <Text style={styles.cardTitle}>Bản ghi âm môi trường</Text>
+        <Text style={styles.meta}>Thời gian: {formatDate(item.createdAt)}</Text>
+        <Text style={styles.meta}>Độ dài: {formatDuration(item.durationMillis)}</Text>
         <Text style={styles.uri} numberOfLines={1}>
           {item.uri}
         </Text>
@@ -130,10 +130,10 @@ export default function RecordingHistoryScreen() {
             onPress={() => handlePlayOrStop(item)}
             style={[styles.actionBtn, isPlaying ? styles.stopBtn : styles.playBtn]}
           >
-            <Text style={styles.actionText}>{isPlaying ? 'Dung' : 'Nghe lai'}</Text>
+            <Text style={styles.actionText}>{isPlaying ? 'Dừng' : 'Nghe lại'}</Text>
           </Pressable>
           <Pressable onPress={() => handleDelete(item)} style={[styles.actionBtn, styles.deleteBtn]}>
-            <Text style={styles.actionText}>Xoa</Text>
+            <Text style={styles.actionText}>Xóa</Text>
           </Pressable>
         </View>
       </View>
@@ -144,9 +144,9 @@ export default function RecordingHistoryScreen() {
     <ScreenContainer scroll={false}>
       <View style={styles.container}>
         <View style={styles.headerRow}>
-          <Text style={styles.title}>Lich su ghi am</Text>
+          <Text style={styles.title}>Lịch sử ghi âm</Text>
           {recordings.length > 0 ? (
-            <PrimaryButton title="Xoa tat ca" variant="outline" onPress={handleClearAll} style={styles.clearAllBtn} />
+            <PrimaryButton title="Xóa tất cả" variant="outline" onPress={handleClearAll} style={styles.clearAllBtn} />
           ) : null}
         </View>
 
@@ -157,7 +157,7 @@ export default function RecordingHistoryScreen() {
           refreshing={loading}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
-          ListEmptyComponent={<Text style={styles.empty}>Chua co file ghi am nao.</Text>}
+          ListEmptyComponent={<Text style={styles.empty}>Chưa có file ghi âm nào.</Text>}
         />
       </View>
     </ScreenContainer>
