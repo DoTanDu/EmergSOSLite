@@ -1,10 +1,10 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import TextInputField from '../components/TextInputField';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
-import { loginUser, loginWithGoogleWeb } from '../services/authService';
+import { loginUser, loginWithGoogleWeb, loginWithGoogleNative, useGoogleAuth } from '../services/authService';
 import { isValidEmail } from '../utils/validators';
 
 export default function LoginScreen({ navigation }) {
@@ -14,6 +14,9 @@ export default function LoginScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Hook cho Google Login trên điện thoại
+  const [request, response, promptAsync] = useGoogleAuth();
 
   function normalizeEmail(value) {
     const trimmed = value.trim();
@@ -50,17 +53,28 @@ export default function LoginScreen({ navigation }) {
   }
 
   async function handleGoogleLogin() {
-    if (Platform.OS !== 'web') {
-      Alert.alert(
-        'Google Login trên điện thoại',
-        'Bản hiện tại ưu tiên Google Login trên web demo. Trên Expo Go/điện thoại cần cấu hình OAuth Client ID native.'
-      );
-      return;
-    }
-
     try {
       setGoogleLoading(true);
-      await loginWithGoogleWeb();
+
+      if (Platform.OS === 'web') {
+        // Web: dùng Firebase popup — hoạt động hoàn toàn
+        await loginWithGoogleWeb();
+      } else {
+        // Điện thoại: cần development build để Google Login hoạt động
+        // Expo Go không hỗ trợ Google OAuth redirect natively
+        const result = await promptAsync();
+        if (result?.type === 'success') {
+          await loginWithGoogleNative(() => Promise.resolve(result));
+        } else if (result?.type === 'cancel' || result?.type === 'dismiss') {
+          // user huỷ — không hiện lỗi
+        } else {
+          Alert.alert(
+            'Google Login chưa khả dụng trên Expo Go',
+            'Tính năng này cần Development Build để hoạt động trên điện thoại.\n\nBạn có thể:\n• Dùng đăng nhập Email/Mật khẩu\n• Hoặc test Google Login trên web',
+            [{ text: 'OK' }]
+          );
+        }
+      }
     } catch (error) {
       Alert.alert('Đăng nhập Google lỗi', error.message);
     } finally {
@@ -114,7 +128,14 @@ export default function LoginScreen({ navigation }) {
         />
 
         <PrimaryButton title="Đăng nhập" icon="🚀" onPress={handleLogin} loading={loading} />
-        <PrimaryButton title="Đăng nhập bằng Google" icon="G" variant="outline" onPress={handleGoogleLogin} loading={googleLoading} />
+        <PrimaryButton
+          title="Đăng nhập bằng Google"
+          icon="G"
+          variant="outline"
+          onPress={handleGoogleLogin}
+          loading={googleLoading}
+          disabled={!request && Platform.OS !== 'web'}
+        />
 
         <View style={styles.dividerRow}>
           <View style={styles.divider} />

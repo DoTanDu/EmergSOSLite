@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
 import { formatDate } from '../utils/formatDate';
 
-export default function DangerReportCard({ report, canManage = false, onEdit, onDelete }) {
+export default function DangerReportCard({ report, canManage = false, onEdit, onDelete, onReport }) {
   return (
     <View style={styles.card}>
       <Text style={styles.type}>{report.type}</Text>
@@ -20,7 +20,13 @@ export default function DangerReportCard({ report, canManage = false, onEdit, on
             <Text style={[styles.actionText, styles.deleteText]}>Xóa</Text>
           </Pressable>
         </View>
-      ) : null}
+      ) : (
+        <View style={styles.actionRow}>
+          <Pressable style={[styles.actionButton, styles.reportButton]} onPress={onReport}>
+            <Text style={[styles.actionText, styles.reportText]}>Báo cáo ảo / Spam</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }
@@ -76,5 +82,12 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     color: colors.danger
+  },
+  reportButton: {
+    backgroundColor: '#334155',
+    borderColor: '#475569'
+  },
+  reportText: {
+    color: '#94A3B8'
   }
 });

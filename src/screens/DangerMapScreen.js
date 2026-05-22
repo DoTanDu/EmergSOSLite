@@ -1,11 +1,11 @@
-﻿import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DangerReportCard from '../components/DangerReportCard';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
 import { auth } from '../config/firebase';
-import { deleteDangerReport, getDangerReports } from '../services/dangerReportService';
+import { deleteDangerReport, getDangerReports, reportDangerPoint } from '../services/dangerReportService';
 
 export default function DangerMapScreen({ navigation }) {
   const [reports, setReports] = useState([]);
@@ -49,6 +49,24 @@ export default function DangerMapScreen({ navigation }) {
 
   const currentUserId = auth.currentUser?.uid;
 
+  function handleReport(reportId) {
+    Alert.alert('Báo cáo ảo / Spam', 'Bạn có chắc chắn điểm nguy hiểm này là giả mạo?', [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Báo cáo',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await reportDangerPoint(reportId, currentUserId);
+            Alert.alert('Thành công', 'Đã ghi nhận báo cáo. Quản trị viên sẽ xem xét gỡ bỏ điểm này.');
+          } catch (error) {
+            Alert.alert('Lỗi', 'Không thể gửi báo cáo: ' + error.message);
+          }
+        }
+      }
+    ]);
+  }
+
   return (
     <ScrollView
       style={styles.container}
@@ -69,6 +87,7 @@ export default function DangerMapScreen({ navigation }) {
             canManage={report.userId === currentUserId}
             onEdit={() => navigation.navigate('AddDangerReport', { report })}
             onDelete={() => handleDelete(report.id)}
+            onReport={() => handleReport(report.id)}
           />
         ))
       )}

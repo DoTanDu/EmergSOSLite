@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/PrimaryButton';
@@ -6,7 +6,8 @@ import SosButton from '../components/SosButton';
 import { colors } from '../constants/colors';
 import { auth } from '../config/firebase';
 import { getCurrentLocation } from '../services/locationService';
-import { createSosEvent } from '../services/sosService';
+import { createSosEvent, sendSosSms, createSosMessage } from '../services/sosService';
+import { getContactsByUser } from '../services/contactService';
 
 export default function HomeScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -17,9 +18,40 @@ export default function HomeScreen({ navigation }) {
 
     try {
       setLoading(true);
+
+      // 1. Lấy vị trí GPS (vẫn lấy được kể cả khi không có mạng internet, chỉ cần bật GPS)
       const location = await getCurrentLocation();
-      const event = await createSosEvent(user.uid, location);
-      navigation.navigate('SosAlert', { event });
+      
+      // Tạo sẵn message offline phòng hờ rớt mạng
+      const offlineMessage = createSosMessage(location);
+      let event = { message: offlineMessage, latitude: location.latitude, longitude: location.longitude, status: 'active' };
+
+      // 2. Thử lưu lên Firebase Database
+      try {
+        event = await createSosEvent(user.uid, location);
+      } catch (firebaseError) {
+        console.warn('Lỗi Firebase (có thể do rớt mạng):', firebaseError.message);
+        Alert.alert('Chế độ Offline', 'Không có kết nối mạng để lưu lên hệ thống. App vẫn sẽ mở tin nhắn SMS để gửi vị trí!');
+      }
+
+      // 3. Lấy danh bạ và Tự động gửi SMS (luôn chạy dù Firebase thành công hay thất bại)
+      try {
+        const contacts = await getContactsByUser(user.uid);
+        const phones = contacts.map((c) => c.phone).filter(Boolean);
+
+        if (phones.length > 0) {
+          await sendSosSms(phones, event.message);
+        }
+      } catch (smsError) {
+        console.warn('Gửi SMS tự động lỗi:', smsError.message);
+      }
+
+      // 4. Chuyển sang màn hình cảnh báo (Đổi Date thành chuỗi để tránh cảnh báo React Navigation)
+      const serializableEvent = {
+        ...event,
+        createdAt: event.createdAt instanceof Date ? event.createdAt.toISOString() : event.createdAt
+      };
+      navigation.navigate('SosAlert', { event: serializableEvent });
     } catch (error) {
       Alert.alert('Không thể kích hoạt SOS', error.message);
     } finally {

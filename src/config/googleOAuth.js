@@ -1,8 +1,5 @@
 export const googleOAuthConfig = {
-  webClientId: '',
+  webClientId: '1031016636784-fe0f0b5cf38cvp0o48v62vgo3c5e3tb8.apps.googleusercontent.com',
   androidClientId: '',
-  iosClientId: ''
+  iosClientId: '1031016636784-i7l6015ulettf889g4vvml30mvup9asj.apps.googleusercontent.com'
 };
-
-// Web demo dùng Firebase Google Popup, không cần Client ID trong file này.
-// Muốn Google Login native trên Expo Go/điện thoại thì tạo OAuth Client ID rồi điền vào đây.

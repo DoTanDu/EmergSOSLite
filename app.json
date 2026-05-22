@@ -17,9 +17,17 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.dotandu6112005.emergsoslite",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "EmergSOS Lite cần vị trí để tạo cảnh báo SOS kèm link Google Maps.",
-        "NSPhotoLibraryUsageDescription": "EmergSOS Lite cần quyền thư viện ảnh để cập nhật ảnh đại diện."
+        "NSPhotoLibraryUsageDescription": "EmergSOS Lite cần quyền thư viện ảnh để cập nhật ảnh đại diện.",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.1031016636784-i7l6015ulettf889g4vvml30mvup9asj"
+            ]
+          }
+        ]
       }
     },
     "android": {

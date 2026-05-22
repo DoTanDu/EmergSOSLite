@@ -6,9 +6,17 @@ import {
   signOut,
   updateProfile,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  signInWithCredential
 } from 'firebase/auth';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import * as Google from 'expo-auth-session/providers/google';
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import { googleOAuthConfig } from '../config/googleOAuth';
+
+// Cần gọi để Expo tự xử lý redirect khi đăng nhập xong
+WebBrowser.maybeCompleteAuthSession();
 
 function normalizeAuthError(error) {
   const code = error?.code || '';
@@ -71,22 +79,60 @@ export async function loginUser({ email, password }) {
   }
 }
 
+// Web: dùng Firebase popup
 export async function loginWithGoogleWeb() {
   try {
-    if (Platform.OS !== 'web') {
-      throw new Error('Google Login bản hiện tại ưu tiên chạy trên web demo. Trên điện thoại cần cấu hình OAuth Client ID native.');
-    }
-
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-
     const credential = await signInWithPopup(auth, provider);
     await saveUserProfile(credential.user, { provider: 'google' });
-
     return credential.user;
   } catch (error) {
     throw new Error(normalizeAuthError(error));
   }
+}
+
+// Điện thoại: dùng expo-auth-session + Firebase credential
+export async function loginWithGoogleNative(promptAsync) {
+  try {
+    const result = await promptAsync();
+
+    if (result?.type !== 'success') {
+      if (result?.type === 'cancel' || result?.type === 'dismiss') {
+        throw new Error('Bạn đã huỷ đăng nhập Google.');
+      }
+      throw new Error('Đăng nhập Google thất bại.');
+    }
+
+    const { id_token } = result.params;
+    if (!id_token) throw new Error('Không nhận được token từ Google.');
+
+    const googleCredential = GoogleAuthProvider.credential(id_token);
+    const userCredential = await signInWithCredential(auth, googleCredential);
+
+    await saveUserProfile(userCredential.user, { provider: 'google' });
+    return userCredential.user;
+  } catch (error) {
+    if (error.message.includes('huỷ') || error.message.includes('thất bại') || error.message.includes('token')) {
+      throw error;
+    }
+    throw new Error(normalizeAuthError(error));
+  }
+}
+
+// Hook để dùng trong component (điện thoại + web)
+export function useGoogleAuth() {
+  const webClientId = googleOAuthConfig.webClientId;
+  const iosClientId = googleOAuthConfig.iosClientId;
+
+  // expo-auth-session tự tạo redirect URI đúng dựa vào iosClientId
+  // Scheme: com.googleusercontent.apps.<client_id>
+  return Google.useAuthRequest({
+    webClientId,
+    androidClientId: googleOAuthConfig.androidClientId || webClientId,
+    iosClientId,
+    scopes: ['profile', 'email']
+  });
 }
 
 export async function logoutUser() {

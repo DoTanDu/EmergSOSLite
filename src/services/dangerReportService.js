@@ -1,4 +1,4 @@
-﻿import { db } from '../config/firebase';
+import { db } from '../config/firebase';
 import {
   addDoc,
   collection,
@@ -37,6 +37,15 @@ export async function updateDangerReport(reportId, payload) {
 export async function deleteDangerReport(reportId) {
   const target = doc(db, DANGER_COLLECTION, reportId);
   return deleteDoc(target);
+}
+
+export async function reportDangerPoint(reportId, userId, reason = 'spam') {
+  return addDoc(collection(db, 'reportedDangers'), {
+    reportId,
+    reportedBy: userId,
+    reason,
+    createdAt: serverTimestamp()
+  });
 }
 
 export async function getDangerReports() {
