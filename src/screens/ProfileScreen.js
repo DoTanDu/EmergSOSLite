@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import ScreenContainer from '../components/ScreenContainer';
@@ -108,12 +108,19 @@ export default function ProfileScreen() {
     }
   }
 
+  const providerText = profile?.provider?.includes('google')
+    ? 'Google'
+    : 'Email/Mật khẩu';
+
   const initial = (displayName || profile?.email || 'U').charAt(0).toUpperCase();
 
   return (
     <ScreenContainer>
       <View style={styles.header}>
-        <Text style={styles.title}>Hồ sơ</Text>
+        <View>
+          <Text style={styles.kicker}>Tài khoản cá nhân</Text>
+          <Text style={styles.title}>Hồ sơ</Text>
+        </View>
         <Pressable style={styles.refreshButton} onPress={loadProfile} disabled={loadingProfile}>
           <Text style={styles.refreshText}>{loadingProfile ? '...' : '↻'}</Text>
         </Pressable>
@@ -137,6 +144,9 @@ export default function ProfileScreen() {
         <Text style={styles.email}>{profile?.email || auth.currentUser?.email || 'Chưa có email'}</Text>
 
         <View style={styles.pillRow}>
+          <View style={styles.pill}>
+            <Text style={styles.pillText}>{providerText}</Text>
+          </View>
           <View style={[styles.pill, styles.safePill]}>
             <Text style={[styles.pillText, styles.safePillText]}>Đang hoạt động</Text>
           </View>
@@ -145,7 +155,10 @@ export default function ProfileScreen() {
 
       <View style={styles.card}>
         <View style={styles.rowBetween}>
-          <Text style={styles.sectionTitle}>Chỉnh sửa hồ sơ</Text>
+          <View>
+            <Text style={styles.sectionTitle}>Chỉnh sửa hồ sơ</Text>
+            <Text style={styles.sectionSub}>Tên hiển thị, số điện thoại và ảnh đại diện.</Text>
+          </View>
           {editing ? (
             <Pressable onPress={handleCancel}>
               <Text style={styles.cancelText}>Hủy</Text>
@@ -176,9 +189,25 @@ export default function ProfileScreen() {
           keyboardType="phone-pad"
         />
 
+        <TextInputField
+          label="Email"
+          leftIcon="✉️"
+          value={profile?.email || auth.currentUser?.email || ''}
+          editable={false}
+          placeholder="Email tài khoản"
+          hint="Email dùng để đăng nhập nên không sửa trực tiếp trong app demo."
+        />
+
+        <PrimaryButton title="Đổi ảnh đại diện" icon="🖼️" variant="ghost" onPress={handlePickAvatar} />
+
         {editing ? (
           <PrimaryButton title="Lưu thay đổi" icon="💾" onPress={handleSave} loading={loading} />
         ) : null}
+      </View>
+
+      <View style={styles.cardSmall}>
+        <Text style={styles.sectionTitle}>Dữ liệu lưu ở đâu?</Text>
+        <Text style={styles.sectionSub}>Thông tin hồ sơ được lưu trong Firestore collection users và đồng bộ với Firebase Auth displayName.</Text>
       </View>
 
       <PrimaryButton title="Đăng xuất" icon="🚪" variant="danger" onPress={handleLogout} />
@@ -193,30 +222,37 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'flex-start'
+  },
+  kicker: {
+    color: colors.white,
+    opacity: 0.9,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    fontSize: 12,
+    letterSpacing: 0.5
   },
   title: {
     color: colors.white,
     fontSize: 32,
-    fontWeight: '900'
+    fontWeight: '900',
+    marginTop: 4
   },
   refreshButton: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center'
   },
   refreshText: {
-    color: colors.text,
+    color: colors.primary,
     fontSize: 22,
     fontWeight: '900'
   },
   profileCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: 28,
     padding: 20,
     borderWidth: 1,
@@ -262,7 +298,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#0F172A',
+    backgroundColor: colors.text,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
@@ -282,8 +318,9 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   pillRow: {
-    width: '100%',
-    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
     justifyContent: 'center'
   },
   pill: {
@@ -304,23 +341,35 @@ const styles = StyleSheet.create({
     color: colors.success
   },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: 24,
     padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
     gap: 12
   },
+  cardSmall: {
+    backgroundColor: colors.warningLight,
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#FDE68A'
+  },
   rowBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 12,
-    alignItems: 'center'
+    alignItems: 'flex-start'
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '900',
     color: colors.text
+  },
+  sectionSub: {
+    marginTop: 3,
+    color: colors.muted,
+    lineHeight: 19
   },
   editLink: {
     color: colors.primary,

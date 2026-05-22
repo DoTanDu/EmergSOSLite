@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import TextInputField from '../components/TextInputField';
@@ -19,7 +19,7 @@ export default function RegisterScreen({ navigation }) {
     if (value.length >= 6) score += 1;
     if (/[A-ZÀ-Ỵ]/.test(value)) score += 1;
     if (/[0-9]/.test(value)) score += 1;
-    if (/[^A-Za-z0-9À-Ỵà-ỹ]/.test(value)) score += 1;
+    if (/[^A-Za-z0-9À-Ỵà-ỵ]/.test(value)) score += 1;
     return score;
   }, [form.password]);
 
@@ -68,10 +68,14 @@ export default function RegisterScreen({ navigation }) {
     }
   }
 
+  const strengthLabels = ['Rất yếu', 'Yếu', 'Ổn', 'Mạnh', 'Rất mạnh'];
+
   return (
     <ScreenContainer>
       <View style={styles.header}>
+        <Text style={styles.kicker}>Bắt đầu trong 30 giây</Text>
         <Text style={styles.title}>Tạo tài khoản an toàn</Text>
+        <Text style={styles.subtitle}>Tài khoản dùng để lưu danh bạ khẩn cấp, lịch sử SOS và hồ sơ cá nhân của bạn.</Text>
       </View>
 
       <View style={styles.card}>
@@ -90,6 +94,7 @@ export default function RegisterScreen({ navigation }) {
           value={form.email}
           onChangeText={(value) => setValue('email', value)}
           error={errors.email}
+          hint="Có thể nhập nhanh phần trước @gmail.com."
           autoCapitalize="none"
           keyboardType="email-address"
           placeholder="email@example.com"
@@ -120,10 +125,13 @@ export default function RegisterScreen({ navigation }) {
           )}
         />
 
-        <View style={styles.strengthTrack}>
-          {[0, 1, 2, 3].map((item) => (
-            <View key={item} style={[styles.strengthSegment, item < passwordStrength && styles.strengthActive]} />
-          ))}
+        <View style={styles.strengthBox}>
+          <View style={styles.strengthTrack}>
+            {[0, 1, 2, 3].map((item) => (
+              <View key={item} style={[styles.strengthSegment, item < passwordStrength && styles.strengthActive]} />
+            ))}
+          </View>
+          <Text style={styles.strengthText}>Độ mạnh: {strengthLabels[passwordStrength]}</Text>
         </View>
 
         <TextInputField
@@ -145,18 +153,31 @@ export default function RegisterScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#0F172A',
+    backgroundColor: colors.text,
     borderRadius: 28,
     padding: 22
   },
+  kicker: {
+    color: colors.primaryLight,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5
+  },
   title: {
+    marginTop: 8,
     fontSize: 30,
     lineHeight: 36,
     fontWeight: '900',
     color: colors.white
   },
+  subtitle: {
+    marginTop: 8,
+    color: colors.white,
+    opacity: 0.9,
+    lineHeight: 20
+  },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: 26,
     padding: 18,
     borderWidth: 1,
@@ -166,6 +187,9 @@ const styles = StyleSheet.create({
   toggle: {
     color: colors.primary,
     fontWeight: '900'
+  },
+  strengthBox: {
+    gap: 6
   },
   strengthTrack: {
     flexDirection: 'row',
@@ -179,5 +203,10 @@ const styles = StyleSheet.create({
   },
   strengthActive: {
     backgroundColor: colors.primary
+  },
+  strengthText: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: '700'
   }
 });

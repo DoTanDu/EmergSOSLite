@@ -4,19 +4,16 @@ import ScreenContainer from '../components/ScreenContainer';
 import TextInputField from '../components/TextInputField';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
-import { loginUser, loginWithGoogleWeb, loginWithGoogleNative, useGoogleAuth } from '../services/authService';
+import { loginUser, loginWithGoogleWeb } from '../services/authService';
 import { isValidEmail } from '../utils/validators';
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('demo@gmail.com');
+  const [password, setPassword] = useState('123456');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
-  // Hook cho Google Login trên điện thoại
-  const [request, response, promptAsync] = useGoogleAuth();
 
   function normalizeEmail(value) {
     const trimmed = value.trim();
@@ -53,28 +50,17 @@ export default function LoginScreen({ navigation }) {
   }
 
   async function handleGoogleLogin() {
+    if (Platform.OS !== 'web') {
+      Alert.alert(
+        'Google Login trên điện thoại',
+        'Bản hiện tại ưu tiên Google Login trên web demo. Trên Expo Go/điện thoại cần cấu hình OAuth Client ID native.'
+      );
+      return;
+    }
+
     try {
       setGoogleLoading(true);
-
-      if (Platform.OS === 'web') {
-        // Web: dùng Firebase popup — hoạt động hoàn toàn
-        await loginWithGoogleWeb();
-      } else {
-        // Điện thoại: cần development build để Google Login hoạt động
-        // Expo Go không hỗ trợ Google OAuth redirect natively
-        const result = await promptAsync();
-        if (result?.type === 'success') {
-          await loginWithGoogleNative(() => Promise.resolve(result));
-        } else if (result?.type === 'cancel' || result?.type === 'dismiss') {
-          // user huỷ — không hiện lỗi
-        } else {
-          Alert.alert(
-            'Google Login chưa khả dụng trên Expo Go',
-            'Tính năng này cần Development Build để hoạt động trên điện thoại.\n\nBạn có thể:\n• Dùng đăng nhập Email/Mật khẩu\n• Hoặc test Google Login trên web',
-            [{ text: 'OK' }]
-          );
-        }
-      }
+      await loginWithGoogleWeb();
     } catch (error) {
       Alert.alert('Đăng nhập Google lỗi', error.message);
     } finally {
@@ -90,10 +76,12 @@ export default function LoginScreen({ navigation }) {
         </View>
         <Text style={styles.appName}>EmergSOS Lite</Text>
         <Text style={styles.heroTitle}>An toàn cá nhân trong một nút bấm</Text>
+        <Text style={styles.heroText}>Đăng nhập để quản lý danh bạ khẩn cấp, gửi SOS kèm vị trí và theo dõi lịch sử cảnh báo.</Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Đăng nhập</Text>
+        <Text style={styles.cardSub}>Dùng tài khoản demo hoặc tài khoản đã đăng ký.</Text>
 
         <TextInputField
           label="Email"
@@ -104,7 +92,7 @@ export default function LoginScreen({ navigation }) {
             if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
           }}
           error={errors.email}
-          placeholder="email@example.com"
+          placeholder="demo@gmail.com"
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -128,14 +116,7 @@ export default function LoginScreen({ navigation }) {
         />
 
         <PrimaryButton title="Đăng nhập" icon="🚀" onPress={handleLogin} loading={loading} />
-        <PrimaryButton
-          title="Đăng nhập bằng Google"
-          icon="G"
-          variant="outline"
-          onPress={handleGoogleLogin}
-          loading={googleLoading}
-          disabled={!request && Platform.OS !== 'web'}
-        />
+        <PrimaryButton title="Đăng nhập bằng Google" icon="G" variant="outline" onPress={handleGoogleLogin} loading={googleLoading} />
 
         <View style={styles.dividerRow}>
           <View style={styles.divider} />
@@ -144,6 +125,11 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <PrimaryButton title="Tạo tài khoản mới" variant="ghost" onPress={() => navigation.navigate('Register')} />
+
+        <View style={styles.demoBox}>
+          <Text style={styles.demoTitle}>Tài khoản demo</Text>
+          <Text style={styles.demoText}>Email: demo@gmail.com · Mật khẩu: 123456</Text>
+        </View>
       </View>
     </ScreenContainer>
   );
@@ -160,13 +146,13 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#0F172A',
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16
   },
   iconText: {
-    color: colors.white,
+    color: colors.primary,
     fontSize: 22,
     fontWeight: '900'
   },
@@ -183,8 +169,14 @@ const styles = StyleSheet.create({
     lineHeight: 36,
     fontWeight: '900'
   },
+  heroText: {
+    marginTop: 10,
+    color: colors.white,
+    opacity: 0.94,
+    lineHeight: 21
+  },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: 26,
     padding: 18,
     borderWidth: 1,
@@ -195,6 +187,11 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '900',
     color: colors.text
+  },
+  cardSub: {
+    color: colors.muted,
+    lineHeight: 20,
+    marginBottom: 2
   },
   toggle: {
     color: colors.primary,
@@ -215,5 +212,19 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 12,
     fontWeight: '700'
+  },
+  demoBox: {
+    backgroundColor: colors.secondaryLight,
+    borderRadius: 16,
+    padding: 12
+  },
+  demoTitle: {
+    color: colors.secondary,
+    fontWeight: '900'
+  },
+  demoText: {
+    color: colors.text,
+    marginTop: 3,
+    fontSize: 13
   }
 });
