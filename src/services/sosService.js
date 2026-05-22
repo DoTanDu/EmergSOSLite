@@ -1,4 +1,4 @@
-import { Share } from 'react-native';
+﻿import { Share } from 'react-native';
 import * as SMS from 'expo-sms';
 import { db } from '../config/firebase';
 import {
@@ -17,18 +17,42 @@ import { formatDate } from '../utils/formatDate';
 
 const SOS_COLLECTION = 'sosEvents';
 
-export function createSosMessage({ latitude, longitude, createdAt = new Date() }) {
-  const mapUrl = createMapUrl(latitude, longitude);
+function buildMapLinks(latitude, longitude, existingUrl = '') {
+  const primaryUrl = existingUrl || createMapUrl(latitude, longitude);
+  if (!primaryUrl) return [];
 
-  return `Tôi đang cần trợ giúp khẩn cấp!\n\nVị trí hiện tại của tôi:\n${mapUrl}\n\nThời gian: ${formatDate(createdAt)}\nVui lòng liên hệ hoặc đến hỗ trợ tôi sớm nhất có thể.`;
+  const secondaryUrl = primaryUrl.replace('https://maps.google.com/?q=', 'https://www.google.com/maps?q=');
+  if (secondaryUrl === primaryUrl) return [primaryUrl];
+  return [primaryUrl, secondaryUrl];
+}
+
+export function createSosMessage({ latitude, longitude, createdAt = new Date() }) {
+  const mapLinks = buildMapLinks(latitude, longitude);
+
+  return [
+    'Tôi đang cần trợ giúp khẩn cấp!',
+    '',
+    'Link vị trí hiện tại:',
+    ...mapLinks,
+    '',
+    `Thời gian: ${formatDate(createdAt)}`,
+    'Vui lòng liên hệ hoặc đến hỗ trợ tôi sớm nhất có thể.'
+  ].join('\n');
 }
 
 export function createSafeMessage(event = {}) {
   const latitude = event.latitude;
   const longitude = event.longitude;
-  const mapUrl = event.mapUrl || (latitude && longitude ? createMapUrl(latitude, longitude) : 'Không có vị trí');
+  const mapLinks = buildMapLinks(latitude, longitude, event.mapUrl || '');
 
-  return `Tôi đã an toàn!\n\nCảnh báo SOS trước đó đã được kết thúc.\nVị trí đã gửi trước đó:\n${mapUrl}\n\nThời gian cập nhật: ${formatDate(new Date())}\nCảm ơn bạn đã quan tâm và hỗ trợ.`;
+  return [
+    'Tôi đã an toàn!',
+    '',
+    'Cảnh báo SOS trước đó đã kết thúc.',
+    ...(mapLinks.length > 0 ? ['Link vị trí đã gửi trước đó:', ...mapLinks, ''] : []),
+    `Thời gian cập nhật: ${formatDate(new Date())}`,
+    'Cảm ơn bạn đã quan tâm và hỗ trợ.'
+  ].join('\n');
 }
 
 export async function createSosEvent(userId, location) {

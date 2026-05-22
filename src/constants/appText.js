@@ -4,3 +4,4 @@ export const appText = {
   sosMessagePrefix: 'Tôi đang cần trợ giúp khẩn cấp!',
   safeStatus: 'Tôi đã an toàn'
 };
+

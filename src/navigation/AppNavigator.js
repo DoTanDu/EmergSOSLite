@@ -13,6 +13,7 @@ import ContactsScreen from '../screens/ContactsScreen';
 import AddContactScreen from '../screens/AddContactScreen';
 import SosAlertScreen from '../screens/SosAlertScreen';
 import SosHistoryScreen from '../screens/SosHistoryScreen';
+import RecordingHistoryScreen from '../screens/RecordingHistoryScreen';
 import FakeCallScreen from '../screens/FakeCallScreen';
 import IncomingFakeCallScreen from '../screens/IncomingFakeCallScreen';
 import DangerMapScreen from '../screens/DangerMapScreen';
@@ -58,6 +59,7 @@ function AppStack() {
       <Stack.Screen name="AddContact" component={AddContactScreen} options={{ title: 'Liên hệ' }} />
       <Stack.Screen name="SosAlert" component={SosAlertScreen} options={{ title: 'SOS Alert' }} />
       <Stack.Screen name="SosHistory" component={SosHistoryScreen} options={{ title: 'Lịch sử SOS' }} />
+      <Stack.Screen name="RecordingHistory" component={RecordingHistoryScreen} options={{ title: 'Lịch sử ghi âm' }} />
       <Stack.Screen name="FakeCall" component={FakeCallScreen} options={{ title: 'Fake Call' }} />
       <Stack.Screen
         name="IncomingFakeCall"
@@ -86,11 +88,7 @@ export default function AppNavigator() {
 
   if (initializing) return <LoadingScreen />;
 
-  return (
-    <NavigationContainer>
-      {user ? <AppStack /> : <AuthStack />}
-    </NavigationContainer>
-  );
+  return <NavigationContainer>{user ? <AppStack /> : <AuthStack />}</NavigationContainer>;
 }
 
 const styles = StyleSheet.create({

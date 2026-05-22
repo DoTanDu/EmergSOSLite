@@ -34,5 +34,10 @@ service cloud.firestore {
       allow create: if ownsRequest();
       allow update, delete: if ownsResource();
     }
+
+    match /recordingEvents/{recordingId} {
+      allow create: if ownsRequest();
+      allow read, update, delete: if ownsResource();
+    }
   }
 }

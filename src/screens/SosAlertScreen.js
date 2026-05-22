@@ -10,6 +10,7 @@ import {
   shareSosMessage
 } from '../services/sosService';
 import { getContactsByUser } from '../services/contactService';
+import { getAmbientRecordingState, stopAmbientRecording } from '../services/ambientRecordingService';
 
 export default function SosAlertScreen({ navigation, route }) {
   const event = route.params?.event;
@@ -62,6 +63,18 @@ export default function SosAlertScreen({ navigation, route }) {
 
       await markSosAsSafe(event.id);
       setStatus('safe');
+      let recordingStopped = false;
+      let recordingUri = '';
+
+      if (getAmbientRecordingState().isRecording) {
+        try {
+          const recordingResult = await stopAmbientRecording();
+          recordingStopped = true;
+          recordingUri = recordingResult.lastRecordingUri || '';
+        } catch (recordingError) {
+          console.warn('Dừng ghi âm môi trường lỗi:', recordingError.message);
+        }
+      }
 
       const phones = await getContactPhones();
       const safeMessage = createSafeMessage(event);
@@ -69,9 +82,15 @@ export default function SosAlertScreen({ navigation, route }) {
 
       Alert.alert(
         'Đã cập nhật an toàn',
-        phones.length > 0
-          ? 'App đã mở tin nhắn thông báo an toàn cho danh bạ. Bạn chỉ cần bấm gửi trong ứng dụng tin nhắn.'
-          : 'Không có số điện thoại trong danh bạ, app đã mở share sheet để chia sẻ thông báo an toàn.'
+        `${phones.length > 0
+          ? 'Đã mở màn hình nhắn tin để gửi thông báo an toàn.'
+          : 'Không có số trong danh bạ, đã mở chia sẻ để gửi thông báo an toàn.'}${
+          recordingStopped
+            ? recordingUri
+              ? `\nĐã dừng ghi âm môi trường.\nFile: ${recordingUri}`
+              : '\nĐã dừng ghi âm môi trường.'
+            : ''
+        }`
       );
     } catch (error) {
       Alert.alert('Cập nhật thất bại', error.message);
@@ -85,7 +104,6 @@ export default function SosAlertScreen({ navigation, route }) {
       <View style={styles.alertBox}>
         <Text style={styles.badge}>{status === 'active' ? 'ĐANG SOS' : 'ĐÃ AN TOÀN'}</Text>
         <Text style={styles.title}>Cảnh báo đã được tạo</Text>
-        <Text style={styles.subtitle}>Kiểm tra nội dung bên dưới rồi bấm chia sẻ qua Zalo/Messenger/SMS/Gmail.</Text>
       </View>
 
       <View style={styles.messageBox}>
@@ -97,9 +115,6 @@ export default function SosAlertScreen({ navigation, route }) {
       {status === 'active' ? (
         <PrimaryButton title="Tôi đã an toàn" variant="success" onPress={handleSafe} loading={loading} />
       ) : null}
-      <Text style={styles.safeNote}>
-        Khi bấm “Tôi đã an toàn”, app sẽ cập nhật trạng thái và mở tin nhắn thông báo an toàn cho danh bạ khẩn cấp.
-      </Text>
       <PrimaryButton title="Xem lịch sử SOS" variant="outline" onPress={() => navigation.navigate('SosHistory')} />
     </ScreenContainer>
   );
@@ -127,12 +142,6 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '900'
   },
-  subtitle: {
-    marginTop: 8,
-    color: colors.white,
-    lineHeight: 20,
-    opacity: 0.95
-  },
   messageBox: {
     backgroundColor: colors.surface,
     borderRadius: 16,
@@ -144,11 +153,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     lineHeight: 22,
     fontSize: 15
-  },
-  safeNote: {
-    color: colors.muted,
-    lineHeight: 20,
-    textAlign: 'center'
   },
   empty: {
     backgroundColor: colors.surface,

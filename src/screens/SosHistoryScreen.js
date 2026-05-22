@@ -12,6 +12,7 @@ import {
   shareSosMessage
 } from '../services/sosService';
 import { getContactsByUser } from '../services/contactService';
+import { getAmbientRecordingState, stopAmbientRecording } from '../services/ambientRecordingService';
 
 export default function SosHistoryScreen() {
   const [events, setEvents] = useState([]);
@@ -47,14 +48,21 @@ export default function SosHistoryScreen() {
     Alert.alert(
       'Đã thông báo an toàn',
       phones.length > 0
-        ? 'App đã mở tin nhắn thông báo an toàn cho danh bạ. Bạn chỉ cần bấm gửi trong ứng dụng tin nhắn.'
-        : 'Không có số điện thoại trong danh bạ, app đã mở share sheet để chia sẻ thông báo an toàn.'
+        ? 'Đã mở màn hình nhắn tin để gửi thông báo an toàn.'
+        : 'Không có số trong danh bạ, đã mở chia sẻ để gửi thông báo an toàn.'
     );
   }
 
   async function handleMarkSafe(event) {
     try {
       await markSosAsSafe(event.id);
+      if (getAmbientRecordingState().isRecording) {
+        try {
+          await stopAmbientRecording();
+        } catch (recordingError) {
+          console.warn('Dừng ghi âm môi trường lỗi:', recordingError.message);
+        }
+      }
       await notifySafeContacts(event);
       await loadEvents();
     } catch (error) {
@@ -69,7 +77,6 @@ export default function SosHistoryScreen() {
       refreshControl={<RefreshControl refreshing={loading} onRefresh={loadEvents} />}
     >
       <Text style={styles.title}>Lịch sử SOS</Text>
-      <Text style={styles.subtitle}>Event mới nhất lên đầu. Mỗi event có trạng thái active hoặc safe.</Text>
 
       {events.length === 0 ? (
         <Text style={styles.empty}>Chưa có lần SOS nào.</Text>
@@ -100,10 +107,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '900',
     color: colors.text
-  },
-  subtitle: {
-    color: colors.muted,
-    lineHeight: 20
   },
   empty: {
     backgroundColor: colors.surface,

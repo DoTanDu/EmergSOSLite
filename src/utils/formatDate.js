@@ -12,3 +12,4 @@ export function formatDate(value) {
     year: 'numeric'
   });
 }
+

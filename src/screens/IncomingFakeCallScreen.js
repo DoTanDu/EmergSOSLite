@@ -1,34 +1,16 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, Vibration, View } from 'react-native';
-import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
 
-const RINGTONE_SOURCE = require('../../assets/fake-call-ringtone.wav');
-
 export default function IncomingFakeCallScreen({ navigation, route }) {
   const callerName = route.params?.callerName || 'Người thân';
-  const ringtonePlayer = useAudioPlayer(RINGTONE_SOURCE);
   const [isAnswered, setIsAnswered] = useState(false);
   const [seconds, setSeconds] = useState(0);
 
   function stopRingtone() {
-    try {
-      ringtonePlayer.pause();
-      ringtonePlayer.seekTo(0);
-    } catch (error) {
-      // Ignore audio cleanup errors during demo.
-    }
-
     Vibration.cancel();
   }
-
-  useEffect(() => {
-    setAudioModeAsync({
-      playsInSilentMode: true,
-      interruptionMode: 'mixWithOthers'
-    }).catch(() => undefined);
-  }, []);
 
   useEffect(() => {
     if (isAnswered) {
@@ -36,18 +18,11 @@ export default function IncomingFakeCallScreen({ navigation, route }) {
       return undefined;
     }
 
-    try {
-      ringtonePlayer.loop = true;
-      ringtonePlayer.seekTo(0);
-      ringtonePlayer.play();
-      Vibration.vibrate([0, 900, 500], true);
-    } catch (error) {
-      // If audio fails on a device, fake call UI still works.
-      Vibration.vibrate([0, 900, 500], true);
-    }
+    // Keep fake-call flow stable even when ringtone asset is missing.
+    Vibration.vibrate([0, 900, 500], true);
 
     return () => stopRingtone();
-  }, [isAnswered, ringtonePlayer]);
+  }, [isAnswered]);
 
   useEffect(() => {
     if (!isAnswered) return undefined;
