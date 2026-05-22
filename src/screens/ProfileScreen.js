@@ -198,8 +198,6 @@ export default function ProfileScreen() {
           hint="Email dùng để đăng nhập nên không sửa trực tiếp trong app demo."
         />
 
-        <PrimaryButton title="Đổi ảnh đại diện" icon="🖼️" variant="ghost" onPress={handlePickAvatar} />
-
         {editing ? (
           <PrimaryButton title="Lưu thay đổi" icon="💾" onPress={handleSave} loading={loading} />
         ) : null}
