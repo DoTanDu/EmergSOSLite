@@ -87,7 +87,7 @@ export default function HomeScreen({ navigation }) {
   }
 
   return (
-    <ScreenContainer style={styles.container}>
+    <ScreenContainer style={styles.container} scroll={false}>
       <View style={styles.topCard}>
         <Text style={styles.hello}>EmergSOS Lite</Text>
         <Text style={styles.title}>Nhấn giữ SOS 3 giây</Text>
