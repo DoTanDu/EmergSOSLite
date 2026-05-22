@@ -2,42 +2,85 @@ import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '../constants/colors';
 
-export default function TextInputField({ label, error, style, ...props }) {
+export default function TextInputField({
+  label,
+  error,
+  hint,
+  leftIcon,
+  rightElement,
+  containerStyle,
+  inputStyle,
+  editable = true,
+  ...props
+}) {
   return (
-    <View style={style}>
+    <View style={[styles.container, containerStyle]}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
-      <TextInput
-        placeholderTextColor={colors.muted}
-        style={[styles.input, error && styles.inputError]}
-        {...props}
-      />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <View style={[styles.inputWrap, !editable && styles.disabledWrap, error && styles.inputError]}>
+        {leftIcon ? <Text style={styles.leftIcon}>{leftIcon}</Text> : null}
+        <TextInput
+          placeholderTextColor={colors.muted}
+          style={[styles.input, !editable && styles.disabledInput, inputStyle]}
+          editable={editable}
+          {...props}
+        />
+        {rightElement ? <View style={styles.rightElement}>{rightElement}</View> : null}
+      </View>
+      {error ? <Text style={styles.error}>{error}</Text> : hint ? <Text style={styles.hint}>{hint}</Text> : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 6
+  },
   label: {
     color: colors.text,
-    fontWeight: '700',
-    marginBottom: 6
+    fontWeight: '800',
+    fontSize: 14
   },
-  input: {
-    backgroundColor: colors.white,
+  inputWrap: {
+    minHeight: 52,
+    backgroundColor: '#0F172A',
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 12,
+    borderRadius: 16,
     paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  input: {
+    flex: 1,
     paddingVertical: 12,
     fontSize: 16,
     color: colors.text
   },
+  leftIcon: {
+    marginRight: 8,
+    fontSize: 17
+  },
+  rightElement: {
+    marginLeft: 8
+  },
+  disabledWrap: {
+    backgroundColor: '#111C31'
+  },
+  disabledInput: {
+    color: colors.muted
+  },
   inputError: {
     borderColor: colors.danger
   },
+  hint: {
+    color: colors.muted,
+    fontSize: 12,
+    lineHeight: 16
+  },
   error: {
-    marginTop: 4,
     color: colors.danger,
-    fontSize: 12
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '700'
   }
 });

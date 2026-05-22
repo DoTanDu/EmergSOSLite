@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/PrimaryButton';
@@ -28,14 +28,13 @@ export default function HomeScreen({ navigation }) {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer style={styles.container}>
       <View style={styles.topCard}>
-        <Text style={styles.hello}>Xin chào 👋</Text>
-        <Text style={styles.title}>Khi gặp nguy hiểm, nhấn giữ nút SOS trong 3 giây.</Text>
+        <Text style={styles.hello}>EmergSOS Lite</Text>
+        <Text style={styles.title}>Nhấn giữ SOS 3 giây</Text>
       </View>
 
       <SosButton onTrigger={handleSosTrigger} disabled={loading} />
-      <Text style={styles.note}>{loading ? 'Đang lấy vị trí và tạo cảnh báo...' : 'Tránh bấm nhầm: nút SOS chỉ chạy khi nhấn giữ đủ thời gian.'}</Text>
 
       <View style={styles.grid}>
         <PrimaryButton title="Danh bạ khẩn cấp" onPress={() => navigation.navigate('Contacts')} style={styles.gridButton} />
@@ -48,28 +47,26 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#171A23'
+  },
   topCard: {
-    backgroundColor: colors.white,
+    backgroundColor: '#101828',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: colors.border
+    borderColor: '#2A3142'
   },
   hello: {
-    color: colors.muted,
+    color: '#98A2B3',
     fontWeight: '700'
   },
   title: {
     marginTop: 6,
-    color: colors.text,
-    fontSize: 22,
-    lineHeight: 30,
+    color: colors.white,
+    fontSize: 28,
+    lineHeight: 34,
     fontWeight: '900'
-  },
-  note: {
-    color: colors.muted,
-    textAlign: 'center',
-    lineHeight: 20
   },
   grid: {
     marginTop: 6,

@@ -1,32 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, Vibration, View } from 'react-native';
+import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
 
+const RINGTONE_SOURCE = require('../../assets/fake-call-ringtone.wav');
+
 export default function IncomingFakeCallScreen({ navigation, route }) {
   const callerName = route.params?.callerName || 'Người thân';
+  const ringtonePlayer = useAudioPlayer(RINGTONE_SOURCE);
   const [isAnswered, setIsAnswered] = useState(false);
   const [seconds, setSeconds] = useState(0);
 
-  useEffect(() => {
-    let interval;
-    if (isAnswered) {
-      interval = setInterval(() => {
-        setSeconds((s) => s + 1);
-      }, 1000);
+  function stopRingtone() {
+    try {
+      ringtonePlayer.pause();
+      ringtonePlayer.seekTo(0);
+    } catch (error) {
+      // Ignore audio cleanup errors during demo.
     }
+
+    Vibration.cancel();
+  }
+
+  useEffect(() => {
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      interruptionMode: 'mixWithOthers'
+    }).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (isAnswered) {
+      stopRingtone();
+      return undefined;
+    }
+
+    try {
+      ringtonePlayer.loop = true;
+      ringtonePlayer.seekTo(0);
+      ringtonePlayer.play();
+      Vibration.vibrate([0, 900, 500], true);
+    } catch (error) {
+      // If audio fails on a device, fake call UI still works.
+      Vibration.vibrate([0, 900, 500], true);
+    }
+
+    return () => stopRingtone();
+  }, [isAnswered, ringtonePlayer]);
+
+  useEffect(() => {
+    if (!isAnswered) return undefined;
+
+    const interval = setInterval(() => {
+      setSeconds((current) => current + 1);
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [isAnswered]);
 
-  const formatTime = (secs) => {
-    const m = Math.floor(secs / 60).toString().padStart(2, '0');
-    const s = (secs % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
+  const formatTime = (totalSeconds) => {
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const remainSeconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${remainSeconds}`;
   };
+
+  function handleReject() {
+    stopRingtone();
+    navigation.goBack();
+  }
+
+  function handleAnswer() {
+    stopRingtone();
+    setIsAnswered(true);
+  }
+
+  function handleEndCall() {
+    stopRingtone();
+    navigation.goBack();
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.calling}>{isAnswered ? formatTime(seconds) : "Cuộc gọi đến..."}</Text>
+      <Text style={styles.calling}>{isAnswered ? formatTime(seconds) : 'Cuộc gọi đến...'}</Text>
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{callerName.charAt(0).toUpperCase()}</Text>
       </View>
@@ -35,11 +91,11 @@ export default function IncomingFakeCallScreen({ navigation, route }) {
 
       <View style={styles.actions}>
         {isAnswered ? (
-          <PrimaryButton title="Kết thúc" variant="danger" onPress={() => navigation.goBack()} style={styles.button} />
+          <PrimaryButton title="Kết thúc" variant="danger" onPress={handleEndCall} style={styles.button} />
         ) : (
           <>
-            <PrimaryButton title="Từ chối" variant="danger" onPress={() => navigation.goBack()} style={styles.button} />
-            <PrimaryButton title="Nghe máy" variant="success" onPress={() => setIsAnswered(true)} style={styles.button} />
+            <PrimaryButton title="Từ chối" variant="danger" onPress={handleReject} style={styles.button} />
+            <PrimaryButton title="Nghe máy" variant="success" onPress={handleAnswer} style={styles.button} />
           </>
         )}
       </View>
