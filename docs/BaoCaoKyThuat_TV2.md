@@ -13,7 +13,9 @@
 | Expo Go | SDK 54.0.0 | Chạy thử app trực tiếp trên điện thoại thật qua QR code |
 | Firebase Authentication | v10 (Web SDK) | Xác thực người dùng bằng Email/Password |
 | Cloud Firestore | v10 (Web SDK) | Cơ sở dữ liệu NoSQL thời gian thực lưu contact, SOS, báo cáo |
+| Cloud Storage | v10 (Web SDK) | Lưu trữ file đa phương tiện (File ghi âm, Avatar) |
 | Expo Location | ~18.0.4 | Lấy tọa độ GPS (latitude/longitude) từ thiết bị |
+| Expo Audio | ~15.0.2 | Ghi âm môi trường xung quanh |
 | React Navigation | v6 | Quản lý điều hướng giữa các màn hình |
 | expo-sms | ~12.0.1 | Mở ứng dụng SMS và tự động điền số điện thoại + nội dung |
 
@@ -42,11 +44,12 @@ Firebase gói Spark cung cấp đủ hạn mức cho bản demo đồ án:
   └─────────────────────────────────┘
         │                    │
         ▼                    ▼
-  Firebase Auth        Cloud Firestore
-  (Đăng nhập/          (Lưu dữ liệu:
-   Đăng ký)             users, contacts,
+  Firebase Auth        Cloud Firestore        Cloud Storage
+  (Đăng nhập/          (Lưu dữ liệu:          (Lưu File:
+   Đăng ký)             users, contacts,       Audio Recording)
                          sosEvents,
-                         dangerReports)
+                         dangerReports,
+                         recordingEvents)
         │
         ▼
   Expo Location API
@@ -113,6 +116,19 @@ Lưu các báo cáo điểm nguy hiểm do cộng đồng đóng góp.
 | `description` | string | Mô tả chi tiết điểm nguy hiểm |
 | `upvotes` | number | Số lượt xác nhận (mặc định 0) |
 | `createdAt` | timestamp | Ngày báo cáo |
+
+### 3.5. Collection `recordingEvents`
+
+Lưu lịch sử các bản ghi âm môi trường.
+
+| Field | Kiểu | Mô tả |
+|---|---|---|
+| `userId` | string | UID người ghi âm |
+| `durationMillis` | number | Thời lượng ghi âm (ms) |
+| `storagePath` | string | Đường dẫn file trên Firebase Storage |
+| `downloadUrl` | string | Link tải audio trực tiếp |
+| `localUri` | string | Đường dẫn lưu trữ nội bộ trên máy |
+| `createdAt` | timestamp | Ngày tạo |
 
 ---
 
@@ -233,6 +249,18 @@ Mỗi query đều lọc theo `userId` để đảm bảo người dùng chỉ t
 - Khi hết giờ, ứng dụng điều hướng sang màn hình Fake Call giả lập giao diện đổ chuông của điện thoại.
 - **Tính thực tế cao:** Khi người dùng bấm "Nghe máy", màn hình không thoát ngay mà chuyển sang trạng thái "Đang gọi" cùng với bộ đếm thời gian (`setInterval` đếm giây) giống hệt một cuộc gọi thật, giúp người dùng có cớ để thoát khỏi tình huống khó xử một cách tự nhiên.
 
+### 4.7. Ghi âm môi trường (Ambient Recording)
+
+**File:** `src/services/ambientRecordingService.js`
+
+- Sử dụng `expo-audio` để kích hoạt micro ghi âm nền.
+- **Luồng hoạt động:** 
+  1. Người dùng bấm nút ghi âm.
+  2. Ứng dụng ghi âm và lưu vào cache cục bộ (`AsyncStorage`).
+  3. Khi bấm dừng, file âm thanh được tự động upload lên **Firebase Cloud Storage** (`users/{uid}/ambientRecordings/...`).
+  4. Lấy `downloadUrl` và lưu metadata vào Firestore collection `recordingEvents`.
+- Tính năng này giúp nạn nhân thu thập bằng chứng (âm thanh đe doạ) một cách bí mật.
+
 ---
 
 ## 5. Security Rules Firestore
@@ -296,6 +324,8 @@ Các truy vấn dùng `where('userId', '==', ...)` kết hợp `orderBy('created
 | T11 | Fake Call | Chọn 5 giây và Start | Sau 5 giây hiện màn hình cuộc gọi giả |
 | T12 | Danger Report | Báo cáo điểm nguy hiểm | Firestore có document mới trong `dangerReports` |
 | T13 | Đăng xuất | Bấm đăng xuất | Quay về màn hình Login |
+| T14 | Ghi âm | Bấm nút Micro ở màn hình Home | App xin quyền, bắt đầu thu, bấm dừng thì upload lên Storage |
+| T15 | Đổi Profile | Cập nhật avatar hoặc tên | Firestore update, UI cập nhật tức thì |
 
 ---
 
@@ -315,7 +345,6 @@ Các truy vấn dùng `where('userId', '==', ...)` kết hợp `orderBy('created
 - Gửi SMS tự động qua API khi có kinh phí.
 - Push notification trực tiếp cho người thân đã cài app.
 - Theo dõi vị trí realtime chỉ trong thời gian SOS đang `active`.
-- Ghi âm khẩn cấp có xin quyền rõ ràng từ người dùng.
 - Xác minh điểm nguy hiểm bằng cơ chế upvote cộng đồng.
 - Tích hợp smartwatch hoặc nút bấm Bluetooth.
 - Phân tích rủi ro khu vực dựa trên dữ liệu báo cáo tập thể.

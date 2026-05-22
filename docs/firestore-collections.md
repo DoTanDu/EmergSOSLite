@@ -46,3 +46,14 @@
 | description | string | Mô tả |
 | upvotes | number | Mặc định 0 |
 | createdAt | timestamp | Ngày tạo |
+
+## recordingEvents
+
+| Field | Type | Ghi chú |
+|---|---|---|
+| userId | string | Người ghi âm |
+| durationMillis | number | Thời lượng ghi âm (ms) |
+| storagePath | string | Đường dẫn file trên Firebase Storage |
+| downloadUrl | string | Link tải audio |
+| localUri | string | Đường dẫn nội bộ trên máy |
+| createdAt | timestamp | Thời điểm tạo |

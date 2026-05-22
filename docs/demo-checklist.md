@@ -12,3 +12,6 @@
 - [ ] Vào SOS History thấy event status safe.
 - [ ] Demo Fake Call 5 giây.
 - [ ] Demo thêm Danger Report.
+- [ ] Bấm nút Ghi âm môi trường (Audio Recording).
+- [ ] Xem lại file ghi âm trong Lịch sử Ghi âm (Recording History).
+- [ ] Cập nhật hồ sơ (Thay đổi Avatar/Tên).
