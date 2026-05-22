@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../constants/colors';
 import { appText } from '../constants/appText';
@@ -13,7 +13,6 @@ export default function SplashScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.logo}>SOS</Text>
       <Text style={styles.title}>{appText.appName}</Text>
-      <Text style={styles.subtitle}>{appText.slogan}</Text>
     </View>
   );
 }
@@ -37,11 +36,5 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 28,
     fontWeight: '900'
-  },
-  subtitle: {
-    marginTop: 8,
-    color: colors.white,
-    opacity: 0.9,
-    textAlign: 'center'
   }
 });

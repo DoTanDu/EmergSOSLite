@@ -1,59 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/PrimaryButton';
+import RecordCircleButton from '../components/RecordCircleButton';
 import SosButton from '../components/SosButton';
 import { colors } from '../constants/colors';
 import { auth } from '../config/firebase';
 import { getCurrentLocation } from '../services/locationService';
 import { createSosEvent, sendSosSms, createSosMessage } from '../services/sosService';
 import { getContactsByUser } from '../services/contactService';
+import {
+  getAmbientRecordingState,
+  startAmbientRecording,
+  subscribeAmbientRecording,
+  toggleAmbientRecording
+} from '../services/ambientRecordingService';
 
 export default function HomeScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
+  const [recordingState, setRecordingState] = useState(getAmbientRecordingState());
+
+  useEffect(() => {
+    const unsubscribe = subscribeAmbientRecording(setRecordingState);
+    return unsubscribe;
+  }, []);
+
+  async function handleToggleRecording() {
+    try {
+      await toggleAmbientRecording();
+    } catch (error) {
+      Alert.alert('Khong the ghi am', error.message);
+    }
+  }
 
   async function handleSosTrigger() {
     const user = auth.currentUser;
-    if (!user) return Alert.alert('Lỗi', 'Bạn cần đăng nhập trước khi SOS.');
+    if (!user) return Alert.alert('Loi', 'Ban can dang nhap truoc khi SOS.');
 
     try {
       setLoading(true);
 
-      // 1. Lấy vị trí GPS (vẫn lấy được kể cả khi không có mạng internet, chỉ cần bật GPS)
-      const location = await getCurrentLocation();
-      
-      // Tạo sẵn message offline phòng hờ rớt mạng
-      const offlineMessage = createSosMessage(location);
-      let event = { message: offlineMessage, latitude: location.latitude, longitude: location.longitude, status: 'active' };
+      if (!recordingState.isRecording) {
+        try {
+          await startAmbientRecording();
+        } catch (recordError) {
+          Alert.alert('Canh bao', `Khong bat duoc ghi am moi truong: ${recordError.message}`);
+        }
+      }
 
-      // 2. Thử lưu lên Firebase Database
+      const location = await getCurrentLocation();
+      const offlineMessage = createSosMessage(location);
+      let event = {
+        message: offlineMessage,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        status: 'active'
+      };
+
       try {
         event = await createSosEvent(user.uid, location);
       } catch (firebaseError) {
-        console.warn('Lỗi Firebase (có thể do rớt mạng):', firebaseError.message);
-        Alert.alert('Chế độ Offline', 'Không có kết nối mạng để lưu lên hệ thống. App vẫn sẽ mở tin nhắn SMS để gửi vị trí!');
+        console.warn('Loi Firebase:', firebaseError.message);
+        Alert.alert('Offline', 'Khong luu duoc len he thong. Van mo SMS de gui vi tri.');
       }
 
-      // 3. Lấy danh bạ và Tự động gửi SMS (luôn chạy dù Firebase thành công hay thất bại)
       try {
         const contacts = await getContactsByUser(user.uid);
         const phones = contacts.map((c) => c.phone).filter(Boolean);
-
         if (phones.length > 0) {
           await sendSosSms(phones, event.message);
         }
       } catch (smsError) {
-        console.warn('Gửi SMS tự động lỗi:', smsError.message);
+        console.warn('Gui SMS tu dong loi:', smsError.message);
       }
 
-      // 4. Chuyển sang màn hình cảnh báo (Đổi Date thành chuỗi để tránh cảnh báo React Navigation)
       const serializableEvent = {
         ...event,
         createdAt: event.createdAt instanceof Date ? event.createdAt.toISOString() : event.createdAt
       };
       navigation.navigate('SosAlert', { event: serializableEvent });
     } catch (error) {
-      Alert.alert('Không thể kích hoạt SOS', error.message);
+      Alert.alert('Khong the kich hoat SOS', error.message);
     } finally {
       setLoading(false);
     }
@@ -63,16 +90,19 @@ export default function HomeScreen({ navigation }) {
     <ScreenContainer style={styles.container}>
       <View style={styles.topCard}>
         <Text style={styles.hello}>EmergSOS Lite</Text>
-        <Text style={styles.title}>Nhấn giữ SOS 3 giây</Text>
+        <Text style={styles.title}>Nhan giu SOS 3 giay</Text>
       </View>
 
       <SosButton onTrigger={handleSosTrigger} disabled={loading} />
 
+      <RecordCircleButton isRecording={recordingState.isRecording} onPress={handleToggleRecording} />
+
       <View style={styles.grid}>
-        <PrimaryButton title="Danh bạ khẩn cấp" onPress={() => navigation.navigate('Contacts')} style={styles.gridButton} />
-        <PrimaryButton title="Lịch sử SOS" variant="outline" onPress={() => navigation.navigate('SosHistory')} style={styles.gridButton} />
+        <PrimaryButton title="Danh ba khan cap" onPress={() => navigation.navigate('Contacts')} style={styles.gridButton} />
+        <PrimaryButton title="Lich su SOS" variant="outline" onPress={() => navigation.navigate('SosHistory')} style={styles.gridButton} />
+        <PrimaryButton title="Lich su ghi am" variant="outline" onPress={() => navigation.navigate('RecordingHistory')} style={styles.gridButton} />
         <PrimaryButton title="Fake Call" variant="outline" onPress={() => navigation.navigate('FakeCall')} style={styles.gridButton} />
-        <PrimaryButton title="Điểm nguy hiểm" variant="outline" onPress={() => navigation.navigate('DangerMap')} style={styles.gridButton} />
+        <PrimaryButton title="Diem nguy hiem" variant="outline" onPress={() => navigation.navigate('DangerMap')} style={styles.gridButton} />
       </View>
     </ScreenContainer>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import TextInputField from '../components/TextInputField';
@@ -49,7 +49,7 @@ export default function AddContactScreen({ navigation, route }) {
       <Text style={styles.title}>{editingContact ? 'Sửa liên hệ' : 'Thêm liên hệ'}</Text>
       <TextInputField label="Tên" value={form.name} onChangeText={(v) => setValue('name', v)} placeholder="Mẹ" />
       <TextInputField label="Số điện thoại" value={form.phone} onChangeText={(v) => setValue('phone', v)} keyboardType="phone-pad" placeholder="09xxxxxxxx" />
-      <TextInputField label="Email" value={form.email} onChangeText={(v) => setValue('email', v)} keyboardType="email-address" autoCapitalize="none" placeholder="Có thể để trống" />
+      <TextInputField label="Email" value={form.email} onChangeText={(v) => setValue('email', v)} keyboardType="email-address" autoCapitalize="none" placeholder="email@example.com" />
       <TextInputField label="Quan hệ" value={form.relationship} onChangeText={(v) => setValue('relationship', v)} placeholder="Mẹ / Ba / Bạn / Anh chị" />
       <PrimaryButton title="Lưu liên hệ" onPress={handleSave} loading={loading} />
     </ScreenContainer>

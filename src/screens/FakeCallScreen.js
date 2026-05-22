@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/PrimaryButton';
@@ -24,11 +24,10 @@ export default function FakeCallScreen({ navigation }) {
   return (
     <ScreenContainer>
       <Text style={styles.title}>Fake Call</Text>
-      <Text style={styles.subtitle}>Bonus mạnh: giả lập cuộc gọi đến để thoát tình huống khó xử.</Text>
 
       <TextInputField label="Tên người gọi" value={callerName} onChangeText={setCallerName} placeholder="Mẹ" />
 
-      <Text style={styles.label}>Chọn thời gian chờ</Text>
+      <Text style={styles.label}>Thời gian chờ</Text>
       <View style={styles.delayRow}>
         {DELAYS.map((delay) => (
           <PrimaryButton
@@ -51,10 +50,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '900',
     color: colors.text
-  },
-  subtitle: {
-    color: colors.muted,
-    lineHeight: 20
   },
   label: {
     color: colors.text,
