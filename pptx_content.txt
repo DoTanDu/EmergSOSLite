@@ -1,0 +1,163 @@
+--- ppt/slides/slide1.xml ---
+BÁO CÁO ĐỒ ÁN
+EmergSOS Lite
+Ứng dụng an toàn cá nhân trong một nút bấm
+Nguyễn Nhật Long - 123000684
+Đỗ Tấn Du - 123001364
+React Native + Expo + Firebase
+--- ppt/slides/slide2.xml ---
+Ý tưởng, đối tượng và scope Lite
+EmergSOS Lite
+02
+App hỗ trợ sinh viên gửi cảnh báo khẩn cấp kèm vị trí GPS, chia sẻ nhanh cho người thân và lưu lịch sử xử lý.
+Vấn đề
+Đi một mình, về khuya, cần báo nhanh vị trí khi gặp rủi ro.
+Mục tiêu
+Một nút SOS, lấy GPS, tạo link Google Maps, chia sẻ cảnh báo.
+Phạm vi
+Bản Lite ưu tiên chạy ổn; không tracking nền 24/7, không gọi cứu hộ thật.
+10+
+màn hình chính
+2 SV
+nhóm phát triển
+Demo ổn
+ưu tiên
+--- ppt/slides/slide3.xml ---
+Công nghệ và kiến trúc hệ thống
+EmergSOS Lite
+03
+Tách rõ UI, điều hướng, service nghiệp vụ và dữ liệu Firebase để dễ test, dễ bảo trì.
+React Native UI
+React Navigation
+Services
+Firebase / APIs
+Frontend
+screens/*
+components/*
+constants/colors.js
+form, loading, alert
+Logic
+authService
+contactService
+sosService
+locationService
+Backend
+Firebase Auth
+Cloud Firestore
+Expo Location
+SMS / Share Sheet
+Dữ liệu theo userId: users, emergencyContacts, sosEvents, dangerReports
+--- ppt/slides/slide4.xml ---
+Phân công công việc nhóm
+EmergSOS Lite
+04
+THÀNH VIÊN 1
+Nguyễn Nhật Long
+MSSV: 123000684
+Navigation toàn app và màn hình chính
+UI Login, Register, Home, Profile
+Component dùng lại: button, card, input, SOS button
+Fake Call UI, Danger Report UI, History UI
+Polish giao diện, sửa tiếng Việt, screenshot báo cáo
+90%
+hoàn thành ước tính
+THÀNH VIÊN 2
+Đỗ Tấn Du
+MSSV: 123001364
+Firebase Auth và cấu hình Firestore
+Service đăng nhập, danh bạ, SOS, vị trí
+GPS, tạo Google Maps URL, lưu sosEvents
+Share/SMS, trạng thái safe, lịch sử SOS
+Danger report service, rules, indexes, test kỹ thuật
+90%
+hoàn thành ước tính
+--- ppt/slides/slide5.xml ---
+Luồng Auth và Hồ sơ người dùng
+EmergSOS Lite
+05
+Chức năng đã có
+Đăng ký bằng họ tên, email, số điện thoại, mật khẩu
+Đăng nhập Email/Password, có tùy chọn Google
+Lưu hồ sơ user vào Firestore collection users
+Chỉnh sửa tên hiển thị, số điện thoại, ảnh đại diện
+Đăng xuất và tự chuyển về màn hình Login
+Mục tiêu UX: form rõ, lỗi dễ hiểu, thao tác ít bước.
+--- ppt/slides/slide6.xml ---
+Luồng SOS Alert - tính năng cốt lõi
+EmergSOS Lite
+06
+Nhấn giữ 3s
+Xin GPS
+Tạo Map URL
+Lưu Firestore
+Chia sẻ/SMS
+Tôi an toàn
+Tin nhắn chứa thời gian, tọa độ và link Google Maps.
+Sự kiện ban đầu có status active, sau đó cập nhật safe.
+Bản Lite không theo dõi nền 24/7 để tránh hao pin và lỗi quyền.
+Core demo
+--- ppt/slides/slide7.xml ---
+Danh bạ, lịch sử SOS và ghi âm môi trường
+EmergSOS Lite
+07
+Danh bạ khẩn cấp
+Thêm, sửa, xóa người liên hệ
+Lưu theo userId để không lộ dữ liệu
+Dùng số điện thoại khi gửi SMS SOS
+Có validate tên, số điện thoại, quan hệ
+Contact
+CRUD Firestore
+Lịch sử SOS
+Hiển thị mới nhất lên đầu
+Có trạng thái active/safe
+Chia sẻ lại cảnh báo
+Lưu thời gian và tọa độ
+Ghi âm: bật/tắt, lưu lịch sử, nghe lại, xóa từng bản ghi hoặc xóa tất cả.
+--- ppt/slides/slide8.xml ---
+Fake Call - tính năng hỗ trợ thoát tình huống khó xử
+EmergSOS Lite
+08
+Cách hoạt động
+Người dùng nhập tên người gọi giả.
+Chọn thời gian chờ 5s, 10s hoặc 30s.
+Hết thời gian sẽ chuyển sang màn hình cuộc gọi đến.
+Có nút Từ chối và Nghe máy để mô phỏng cuộc gọi thật.
+Bonus mạnh
+Tăng tính thực tế khi demo, không phụ thuộc server.
+--- ppt/slides/slide9.xml ---
+Điểm nguy hiểm cộng đồng
+EmergSOS Lite
+09
+Luồng xử lý
+Báo cáo vị trí nguy hiểm kèm loại, mô tả và GPS.
+Danh sách hiển thị các report mới nhất để người dùng tham khảo.
+Người tạo report được sửa hoặc xóa report của mình.
+Người khác có thể báo cáo ảo/spam để quản trị viên xem xét.
+Bản Lite ưu tiên list ổn định thay vì map phụ thuộc API key.
+dangerReports
+collection
+--- ppt/slides/slide10.xml ---
+Database, kiểm thử và kết quả demo
+EmergSOS Lite
+10
+Firestore collections
+users: hồ sơ người dùng
+emergencyContacts: danh bạ khẩn cấp
+sosEvents: lịch sử SOS và trạng thái
+dangerReports: điểm nguy hiểm
+Rule chính: lọc dữ liệu theo userId
+Checklist kiểm thử
+Register/Login, thêm/xóa/sửa contact, lấy GPS, kích hoạt SOS.
+Mở share/SMS, bấm Tôi đã an toàn, xem lịch sử SOS.
+Fake Call, ghi âm môi trường, báo cáo điểm nguy hiểm, logout.
+Luồng demo chính
+Đăng ký
+Đăng nhập
+Thêm contact
+Nhấn SOS
+Chia sẻ/SMS
+An toàn
+Lịch sử
+Fake Call
+Điểm nguy hiểm
+Kết quả: core app chạy được trên Expo Go, UI đồng bộ, luồng báo động đầy đủ cho bản Lite.

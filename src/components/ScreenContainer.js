@@ -14,7 +14,7 @@ export default function ScreenContainer({ children, scroll = true, style }) {
 
   return (
     <SafeAreaView style={[styles.container, style]}>
-      <ScrollView contentContainerStyle={styles.content}>{children}</ScrollView>
+      <ScrollView contentContainerStyle={[styles.content, { flexGrow: 1 }]} bounces={false} showsVerticalScrollIndicator={false}>{children}</ScrollView>
     </SafeAreaView>
   );
 }
