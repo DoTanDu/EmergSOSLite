@@ -26,35 +26,37 @@
 ## 🚀 Hướng Dẫn Cài Đặt (Installation)
 
 ### Yêu cầu hệ thống:
+
 - Đã cài đặt [Node.js](https://nodejs.org/) (Khuyên dùng bản LTS).
 - Cài đặt ứng dụng **Expo Go** trên thiết bị di động (iOS/Android).
 
 ### Các bước chạy dự án:
 
 1. **Clone dự án về máy:**
+
    ```bash
    git clone https://github.com/DoTanDu/EmergSOSLite.git
    cd EmergSOSLite
    ```
-
 2. **Cài đặt thư viện (Dependencies):**
+
    ```bash
    npm install
    ```
-
 3. **Khởi động Server:**
+
    ```bash
    npx expo start -c
    ```
-   *(Để chia sẻ dự án cho máy khác mạng Wi-Fi, hãy dùng lệnh `npx expo start --tunnel`)*
 
+   *(Để chia sẻ dự án cho máy khác mạng Wi-Fi, hãy dùng lệnh `npx expo start --tunnel`)*
 4. **Trải nghiệm App:** Mở ứng dụng Camera (iPhone) hoặc Expo Go (Android) và quét mã QR hiện ra trên màn hình Terminal.
 
 ---
 
 ## 👥 Thành Viên Nhóm
 
-- **Thành viên 1:** [Điền Tên] - [Vai Trò / MSSV]
-- **Thành viên 2:** [Điền Tên] - [Vai Trò / MSSV]
+- **Nguyễn Nhật Long** - Trưởng nhóm Frontend/UI (MSSV: 123000684)
+- **Đỗ Tấn Du** - Kỹ sư Backend/Hệ thống (MSSV: 123001364)
 
 > *Dự án được thực hiện nhằm mục đích học thuật và báo cáo đồ án môn học.*
