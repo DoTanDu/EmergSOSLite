@@ -8,17 +8,18 @@
 
 - **Gửi cảnh báo SOS tự động:** Tự động lấy toạ độ GPS và mở trình nhắn tin (SMS) để gửi link Google Maps ngay lập tức.
 - **Hoạt động Offline (Ngoại tuyến):** Tính năng SOS độc lập với Firebase, đảm bảo vẫn gửi được SMS cứu trợ kể cả khi không có mạng Internet.
-- **Bản đồ Điểm Nguy Hiểm (Danger Map):** Cộng đồng cùng đóng góp (Crowdsource) các vị trí rủi ro như "Chó dữ", "Ngập lụt", "Cướp giật".
-- **Kiểm duyệt Cộng Đồng (Report Spam):** Cho phép người dùng báo cáo các điểm nguy hiểm giả mạo để Admin xử lý.
-- **Đăng nhập Google & Email:** Hỗ trợ đa nền tảng với xác thực Firebase Authentication.
+- **Bản đồ Điểm Nguy Hiểm (Danger Map):** Cộng đồng cùng đóng góp (Crowdsource) các vị trí rủi ro. Có tính năng kiểm duyệt (Report Spam).
+- **Ghi âm khẩn cấp (Ambient Recording):** Chạy ngầm và tự động tải file âm thanh làm bằng chứng lên Cloud Storage.
+- **Cuộc gọi giả (Fake Call):** Lên lịch đổ chuông như cuộc gọi thật để thoát khỏi tình huống khó xử.
+- **Tài khoản & Hồ sơ cá nhân:** Xác thực đa nền tảng, cho phép chỉnh sửa Avatar và thông tin liên hệ.
 
 ---
 
 ## 🛠 Công Nghệ Sử Dụng (Tech Stack)
 
 - **Frontend:** React Native, Expo SDK 54, React Navigation
-- **Backend:** Firebase Authentication, Cloud Firestore (NoSQL Realtime Database)
-- **APIs/Libraries:** Expo Location, Expo SMS, Native Intent (Mail/Call)
+- **Backend:** Firebase Authentication, Cloud Firestore (Realtime Database), Firebase Cloud Storage
+- **APIs/Libraries:** Expo Location, Expo Audio, Expo SMS, Native Intent (Mail/Call)
 - **UI Design:** Flexbox, SafeAreaContext, Vector Icons
 
 ---
