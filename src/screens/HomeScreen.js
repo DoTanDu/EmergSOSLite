@@ -6,7 +6,8 @@ import SosButton from '../components/SosButton';
 import { colors } from '../constants/colors';
 import { auth } from '../config/firebase';
 import { getCurrentLocation } from '../services/locationService';
-import { createSosEvent } from '../services/sosService';
+import { createSosEvent, sendSosSms, createSosMessage } from '../services/sosService';
+import { getContactsByUser } from '../services/contactService';
 
 export default function HomeScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -17,9 +18,40 @@ export default function HomeScreen({ navigation }) {
 
     try {
       setLoading(true);
+
+      // 1. Lấy vị trí GPS (vẫn lấy được kể cả khi không có mạng internet, chỉ cần bật GPS)
       const location = await getCurrentLocation();
-      const event = await createSosEvent(user.uid, location);
-      navigation.navigate('SosAlert', { event });
+      
+      // Tạo sẵn message offline phòng hờ rớt mạng
+      const offlineMessage = createSosMessage(location);
+      let event = { message: offlineMessage, latitude: location.latitude, longitude: location.longitude, status: 'active' };
+
+      // 2. Thử lưu lên Firebase Database
+      try {
+        event = await createSosEvent(user.uid, location);
+      } catch (firebaseError) {
+        console.warn('Lỗi Firebase (có thể do rớt mạng):', firebaseError.message);
+        Alert.alert('Chế độ Offline', 'Không có kết nối mạng để lưu lên hệ thống. App vẫn sẽ mở tin nhắn SMS để gửi vị trí!');
+      }
+
+      // 3. Lấy danh bạ và Tự động gửi SMS (luôn chạy dù Firebase thành công hay thất bại)
+      try {
+        const contacts = await getContactsByUser(user.uid);
+        const phones = contacts.map((c) => c.phone).filter(Boolean);
+
+        if (phones.length > 0) {
+          await sendSosSms(phones, event.message);
+        }
+      } catch (smsError) {
+        console.warn('Gửi SMS tự động lỗi:', smsError.message);
+      }
+
+      // 4. Chuyển sang màn hình cảnh báo (Đổi Date thành chuỗi để tránh cảnh báo React Navigation)
+      const serializableEvent = {
+        ...event,
+        createdAt: event.createdAt instanceof Date ? event.createdAt.toISOString() : event.createdAt
+      };
+      navigation.navigate('SosAlert', { event: serializableEvent });
     } catch (error) {
       Alert.alert('Không thể kích hoạt SOS', error.message);
     } finally {
@@ -28,14 +60,13 @@ export default function HomeScreen({ navigation }) {
   }
 
   return (
-    <ScreenContainer>
+    <ScreenContainer style={styles.container}>
       <View style={styles.topCard}>
-        <Text style={styles.hello}>Xin chào 👋</Text>
-        <Text style={styles.title}>Khi gặp nguy hiểm, nhấn giữ nút SOS trong 3 giây.</Text>
+        <Text style={styles.hello}>EmergSOS Lite</Text>
+        <Text style={styles.title}>Nhấn giữ SOS 3 giây</Text>
       </View>
 
       <SosButton onTrigger={handleSosTrigger} disabled={loading} />
-      <Text style={styles.note}>{loading ? 'Đang lấy vị trí và tạo cảnh báo...' : 'Tránh bấm nhầm: nút SOS chỉ chạy khi nhấn giữ đủ thời gian.'}</Text>
 
       <View style={styles.grid}>
         <PrimaryButton title="Danh bạ khẩn cấp" onPress={() => navigation.navigate('Contacts')} style={styles.gridButton} />
@@ -48,28 +79,26 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#171A23'
+  },
   topCard: {
-    backgroundColor: colors.white,
+    backgroundColor: '#101828',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: colors.border
+    borderColor: '#2A3142'
   },
   hello: {
-    color: colors.muted,
+    color: '#98A2B3',
     fontWeight: '700'
   },
   title: {
     marginTop: 6,
-    color: colors.text,
-    fontSize: 22,
-    lineHeight: 30,
+    color: colors.white,
+    fontSize: 28,
+    lineHeight: 34,
     fontWeight: '900'
-  },
-  note: {
-    color: colors.muted,
-    textAlign: 'center',
-    lineHeight: 20
   },
   grid: {
     marginTop: 6,

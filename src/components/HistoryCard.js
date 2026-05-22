@@ -28,7 +28,7 @@ export default function HistoryCard({ event, onMarkSafe, onShare }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 14,
     borderWidth: 1,

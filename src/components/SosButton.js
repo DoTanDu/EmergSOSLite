@@ -66,13 +66,15 @@ const styles = StyleSheet.create({
     width: 230,
     height: 230,
     borderRadius: 115,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#1A2336',
+    borderWidth: 1,
+    borderColor: '#2E3B57',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colors.primary,
-    shadowOpacity: 0.25,
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
     shadowRadius: 20,
-    elevation: 8
+    elevation: 10
   },
   circle: {
     width: 188,
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#ffcdd2'
+    backgroundColor: '#2C374F'
   },
   progressBar: {
     height: '100%',

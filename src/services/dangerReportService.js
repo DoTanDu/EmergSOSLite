@@ -2,10 +2,13 @@ import { db } from '../config/firebase';
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
   where
 } from 'firebase/firestore';
 
@@ -19,6 +22,28 @@ export async function addDangerReport(userId, report) {
     type: report.type,
     description: report.description.trim(),
     upvotes: 0,
+    createdAt: serverTimestamp()
+  });
+}
+
+export async function updateDangerReport(reportId, payload) {
+  const target = doc(db, DANGER_COLLECTION, reportId);
+  return updateDoc(target, {
+    type: payload.type,
+    description: payload.description.trim()
+  });
+}
+
+export async function deleteDangerReport(reportId) {
+  const target = doc(db, DANGER_COLLECTION, reportId);
+  return deleteDoc(target);
+}
+
+export async function reportDangerPoint(reportId, userId, reason = 'spam') {
+  return addDoc(collection(db, 'reportedDangers'), {
+    reportId,
+    reportedBy: userId,
+    reason,
     createdAt: serverTimestamp()
   });
 }
