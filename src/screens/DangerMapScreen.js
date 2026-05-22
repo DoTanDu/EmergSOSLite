@@ -1,10 +1,11 @@
-import React, { useCallback, useState } from 'react';
+﻿import React, { useCallback, useState } from 'react';
 import { Alert, RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DangerReportCard from '../components/DangerReportCard';
 import PrimaryButton from '../components/PrimaryButton';
 import { colors } from '../constants/colors';
-import { getDangerReports } from '../services/dangerReportService';
+import { auth } from '../config/firebase';
+import { deleteDangerReport, getDangerReports } from '../services/dangerReportService';
 
 export default function DangerMapScreen({ navigation }) {
   const [reports, setReports] = useState([]);
@@ -28,6 +29,26 @@ export default function DangerMapScreen({ navigation }) {
     }, [loadReports])
   );
 
+  function handleDelete(reportId) {
+    Alert.alert('Xóa điểm nguy hiểm', 'Bạn chắc chắn muốn xóa báo cáo này?', [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Xóa',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteDangerReport(reportId);
+            await loadReports();
+          } catch (error) {
+            Alert.alert('Không thể xóa', error.message);
+          }
+        }
+      }
+    ]);
+  }
+
+  const currentUserId = auth.currentUser?.uid;
+
   return (
     <ScrollView
       style={styles.container}
@@ -35,14 +56,21 @@ export default function DangerMapScreen({ navigation }) {
       refreshControl={<RefreshControl refreshing={loading} onRefresh={loadReports} />}
     >
       <Text style={styles.title}>Điểm nguy hiểm</Text>
-      <Text style={styles.subtitle}>Bản Lite dùng list dự phòng. Nếu map ổn, Thành viên 2 có thể thay bằng react-native-maps marker.</Text>
 
       <PrimaryButton title="+ Báo cáo điểm nguy hiểm" onPress={() => navigation.navigate('AddDangerReport')} />
 
       {reports.length === 0 ? (
         <Text style={styles.empty}>Chưa có báo cáo nào.</Text>
       ) : (
-        reports.map((report) => <DangerReportCard key={report.id} report={report} />)
+        reports.map((report) => (
+          <DangerReportCard
+            key={report.id}
+            report={report}
+            canManage={report.userId === currentUserId}
+            onEdit={() => navigation.navigate('AddDangerReport', { report })}
+            onDelete={() => handleDelete(report.id)}
+          />
+        ))
       )}
     </ScrollView>
   );
@@ -62,12 +90,8 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: colors.text
   },
-  subtitle: {
-    color: colors.muted,
-    lineHeight: 20
-  },
   empty: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 16,
     color: colors.muted,

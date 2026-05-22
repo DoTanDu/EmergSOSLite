@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import TextInputField from '../components/TextInputField';
@@ -8,8 +8,8 @@ import { loginUser, loginWithGoogleWeb } from '../services/authService';
 import { isValidEmail } from '../utils/validators';
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('demo@gmail.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -76,12 +76,10 @@ export default function LoginScreen({ navigation }) {
         </View>
         <Text style={styles.appName}>EmergSOS Lite</Text>
         <Text style={styles.heroTitle}>An toàn cá nhân trong một nút bấm</Text>
-        <Text style={styles.heroText}>Đăng nhập để quản lý danh bạ khẩn cấp, gửi SOS kèm vị trí và theo dõi lịch sử cảnh báo.</Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Đăng nhập</Text>
-        <Text style={styles.cardSub}>Dùng tài khoản demo hoặc tài khoản đã đăng ký.</Text>
 
         <TextInputField
           label="Email"
@@ -92,7 +90,7 @@ export default function LoginScreen({ navigation }) {
             if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
           }}
           error={errors.email}
-          placeholder="demo@gmail.com"
+          placeholder="email@example.com"
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -125,11 +123,6 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <PrimaryButton title="Tạo tài khoản mới" variant="ghost" onPress={() => navigation.navigate('Register')} />
-
-        <View style={styles.demoBox}>
-          <Text style={styles.demoTitle}>Tài khoản demo</Text>
-          <Text style={styles.demoText}>Email: demo@gmail.com · Mật khẩu: 123456</Text>
-        </View>
       </View>
     </ScreenContainer>
   );
@@ -146,13 +139,13 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: colors.white,
+    backgroundColor: '#0F172A',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16
   },
   iconText: {
-    color: colors.primary,
+    color: colors.white,
     fontSize: 22,
     fontWeight: '900'
   },
@@ -169,14 +162,8 @@ const styles = StyleSheet.create({
     lineHeight: 36,
     fontWeight: '900'
   },
-  heroText: {
-    marginTop: 10,
-    color: colors.white,
-    opacity: 0.94,
-    lineHeight: 21
-  },
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: 26,
     padding: 18,
     borderWidth: 1,
@@ -187,11 +174,6 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '900',
     color: colors.text
-  },
-  cardSub: {
-    color: colors.muted,
-    lineHeight: 20,
-    marginBottom: 2
   },
   toggle: {
     color: colors.primary,
@@ -212,19 +194,5 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 12,
     fontWeight: '700'
-  },
-  demoBox: {
-    backgroundColor: colors.secondaryLight,
-    borderRadius: 16,
-    padding: 12
-  },
-  demoTitle: {
-    color: colors.secondary,
-    fontWeight: '900'
-  },
-  demoText: {
-    color: colors.text,
-    marginTop: 3,
-    fontSize: 13
   }
 });

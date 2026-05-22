@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
   inputWrap: {
     minHeight: 52,
-    backgroundColor: colors.white,
+    backgroundColor: '#0F172A',
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 16,
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     marginLeft: 8
   },
   disabledWrap: {
-    backgroundColor: '#F3F4F6'
+    backgroundColor: '#111C31'
   },
   disabledInput: {
     color: colors.muted

@@ -35,7 +35,7 @@ export default function PrimaryButton({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isOutline || isGhost ? colors.primary : colors.white} />
+        <ActivityIndicator color={isOutline || isGhost ? colors.text : colors.white} />
       ) : (
         <View style={styles.content}>
           {icon ? <Text style={[styles.icon, (isOutline || isGhost) && styles.outlineText]}>{icon}</Text> : null}
@@ -48,17 +48,19 @@ export default function PrimaryButton({
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: 52,
+    minHeight: 54,
     borderRadius: 16,
-    paddingHorizontal: 18,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
+    borderWidth: 1,
+    borderColor: '#FF7A7C',
     shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4
   },
   content: {
     flexDirection: 'row',
@@ -71,25 +73,30 @@ const styles = StyleSheet.create({
     fontSize: 17
   },
   outline: {
-    backgroundColor: colors.white,
+    backgroundColor: '#1A2438',
     borderWidth: 1,
-    borderColor: colors.primary,
-    shadowOpacity: 0,
-    elevation: 0
+    borderColor: '#3A4A67',
+    shadowOpacity: 0.15,
+    elevation: 1
   },
   ghost: {
     backgroundColor: colors.primaryLight,
-    shadowOpacity: 0,
-    elevation: 0
+    borderWidth: 1,
+    borderColor: '#553338',
+    shadowOpacity: 0.12,
+    elevation: 1
   },
   danger: {
-    backgroundColor: colors.danger
+    backgroundColor: colors.danger,
+    borderColor: '#FB7185'
   },
   success: {
-    backgroundColor: colors.success
+    backgroundColor: colors.success,
+    borderColor: '#4ADE80'
   },
   dark: {
-    backgroundColor: colors.text
+    backgroundColor: '#0F172A',
+    borderColor: '#334155'
   },
   disabled: {
     opacity: 0.55
@@ -103,6 +110,6 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   outlineText: {
-    color: colors.primary
+    color: colors.text
   }
 });

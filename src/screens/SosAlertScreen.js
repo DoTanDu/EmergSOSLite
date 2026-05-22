@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
   },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.white,
-    color: colors.primary,
+    backgroundColor: '#0F172A',
+    color: colors.white,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     opacity: 0.95
   },
   messageBox: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   empty: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 16,
     color: colors.muted,

@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     lineHeight: 20
   },
   empty: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     padding: 16,
     borderRadius: 16,
     color: colors.muted,
